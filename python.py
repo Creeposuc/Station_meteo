@@ -1,8 +1,9 @@
 import serial
 import tkinter
 import time
-
-liste =[]
+port="COM4"
+liste_des_luminosite =[]
+liste_des_temperature =[]
 #########################initialisation################################
 
 # def teste_emission():
@@ -22,15 +23,25 @@ def initialisation():
     pass
 
 ###########################communication #######################################
-port="COM4"
+
 def reception():
+    a=0
     communication_serie = serial.Serial(port, 9600)
-    while True:
+    while len(liste_des_luminosite)<10:
         valeur = communication_serie.readline()
+        valeur = str(valeur)
         print(valeur)
+        if ">>>" in valeur:
+            a=0
+            a+=1
+        elif a==1:
+            liste_des_luminosite.append(float(valeur[2:][:6]))
+            a+=1
+        elif a==2:
+            liste_des_temperature.append(float(valeur[2:][:6]))
+            a=0
 
-        liste.append(valeur)
-
+    print(">>>",liste_des_luminosite,"\n", liste_des_temperature)
 ##########################anlyse séparées#######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
 def analyse_donnees_unique(valeur):
@@ -78,5 +89,7 @@ def Affichage_console(valeurs,moyenne, maximum, minimum):
 
 
 ######################################début ####################################
+configuration()
 reception()
-#fichier.close()
+analyse_plusieurs_donnees(liste_des_luminosite)
+analyse_plusieurs_donnees(liste_des_temperature)

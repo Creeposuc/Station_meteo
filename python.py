@@ -1,7 +1,8 @@
 import serial
 import tkinter
 import time
-import os
+
+liste =[]
 #########################initialisation################################
 
 # def teste_emission():
@@ -27,6 +28,9 @@ def reception():
     while True:
         valeur = communication_serie.readline()
         print(valeur)
+
+        liste.append(valeur)
+
 ##########################anlyse séparées#######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
 def analyse_donnees_unique(valeur):
@@ -75,3 +79,4 @@ def Affichage_console(valeurs,moyenne, maximum, minimum):
 
 ######################################début ####################################
 reception()
+#fichier.close()

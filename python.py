@@ -1,9 +1,11 @@
 import serial
 import tkinter
 import time
+from random import randint
 port="COM4"
 liste_des_luminosite =[]
 liste_des_temperature =[]
+
 #########################initialisation################################
 
 # def teste_emission():
@@ -42,6 +44,28 @@ def reception():
             a=0
 
     print(">>>",liste_des_luminosite,"\n", liste_des_temperature)
+
+def simulation_reception():
+        a=0
+        while len(liste_des_luminosite)<10:
+            if a==0:
+                valeur = ">>>"
+                print("premier passage")
+            else:
+                valeur = randint(0,1024)
+                valeur = str(valeur)
+                print(valeur)
+            if ">>>" in valeur:
+                a=0
+                a+=1
+            elif a==1:
+                liste_des_luminosite.append(float(valeur))
+                a+=1
+            elif a==2:
+                liste_des_temperature.append(float(valeur))
+                a=0
+
+        print(">>>",liste_des_luminosite,"\n", liste_des_temperature)
 ##########################anlyse séparées#######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
 def analyse_donnees_unique(valeur):
@@ -90,6 +114,6 @@ def Affichage_console(valeurs,moyenne, maximum, minimum):
 
 ######################################début ####################################
 configuration()
-reception()
+simulation_reception()
 analyse_plusieurs_donnees(liste_des_luminosite)
 analyse_plusieurs_donnees(liste_des_temperature)

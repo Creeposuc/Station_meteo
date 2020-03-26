@@ -14,13 +14,13 @@ liste_des_temperature =[]
 #     time.sleep(1)
 
 def configuration():#recherche la connexion série
-    global port
+    global port, nombre_de_mesures
     Systeme_exploitation = str(input("quel est votre sytème d'exploitation (w/l)?\n>>>"))
     if Systeme_exploitation=="l":
         port="/dev/ttyACM0"
     elif Systeme_exploitation=="w":
         port= "COM4"
-
+    nombre_de_mesures=int(input("le nombre de mesures à effectuer: \n>>>"))
 def initialisation():
     pass
 
@@ -29,7 +29,7 @@ def initialisation():
 def reception():
     a=0
     communication_serie = serial.Serial(port, 9600)
-    while len(liste_des_luminosite)<10:
+    while len(liste_des_luminosite)<nombre_de_mesures:
         valeur = communication_serie.readline()
         valeur = str(valeur)
         print(valeur)
@@ -37,15 +37,15 @@ def reception():
             a=0
             a+=1
         elif a==1:
-            liste_des_luminosite.append(float(valeur[2:][:6]))
+            liste_des_luminosite.append(float(valeur[2:][:5]))
             a+=1
         elif a==2:
-            liste_des_temperature.append(float(valeur[2:][:6]))
+            liste_des_temperature.append(float(valeur[2:][:5]))
             a=0
 
     print(">>>",liste_des_luminosite,"\n", liste_des_temperature)
 
-def simulation_reception():
+def simulation_reception(): #simule la réception des données des capteur pour pouvoir coder sans arduino
         a=0
         while len(liste_des_luminosite)<10:
             if a==0:
@@ -93,27 +93,10 @@ def analyse_longue_periode(valeurs):
 def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
 
-###########################communication #######################################
-#reçois et envoie les informations
-# def demande(type, dure, quantite):
-#     if type==plusieurs_données:
-#         communication_envoie.write("1{}{}".format(dure, quantite).encode())
-#     elif type==longue_periode:
-#         pass
-#     elif type==donnees_unique:
-#         pass
-#     pass
-#
-# def recevoir():
-#     reception=ser.readline()
-#     if reception=="debut":
-#         while reception=="Fin":
-#             liste.append(reception)
-#     print(reception)
 
 
 ######################################début ####################################
 configuration()
-simulation_reception()
+reception()
 analyse_plusieurs_donnees(liste_des_luminosite)
 analyse_plusieurs_donnees(liste_des_temperature)

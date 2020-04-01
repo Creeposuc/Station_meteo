@@ -23,7 +23,7 @@ def affichage_tkinter():
     Menu_fichier.add_command(label = "Enregistrer")
     Menu_fichier.add_command(   label = "Remise à zéro")
     Menu_fichier.add_separator()
-    Menu_fichier.add_command(label = "Quitter")
+    Menu_fichier.add_command(label = "Quitter", command=exit)
     bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier)
 
     Menu_aide = Menu(bar_de_menu, tearoff=0)
@@ -46,7 +46,7 @@ def affichage_tkinter():
 
     ##########################zone d'affichage valeur simple####################
 # def Affichage_une_mesure():
-    titre_affichage_une_valeur = Label(fenetre, text="Affichage des valeurs")
+    titre_affichage_une_valeur = Label(fenetre, text="")
     titre_affichage_une_valeur.grid(row=2   ,column=0, columnspan=2)
 
     affichage_temperature_une_valeur = Label(fenetre, text="Temperature :")
@@ -164,11 +164,9 @@ def demarrage():
     analyse_donnees(liste_des_temperature)
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]
-
-    if nombre_de_mesures==1:
-        valeur_temperature.config( text =  temperature_actuelle)
-        valeur_humidite.config( text =  humidite_actuelle)
-    else:
+    valeur_temperature.config( text =  temperature_actuelle)
+    valeur_humidite.config( text =  humidite_actuelle)
+    if nombre_de_mesures!=1:
         valeur_min_temperature.config(text = minimum)
         valeur_max_temperature.config(text = maximum)
 

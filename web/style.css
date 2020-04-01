@@ -2,3 +2,6 @@ nav{
   position: sticky;
   top: 10px;
 }
+p{
+  color: green;
+}

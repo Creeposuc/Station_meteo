@@ -1,5 +1,6 @@
 # import serial
 from tkinter import *
+from tkinter.messagebox import *
 import time
 from random import randint
 import csv
@@ -15,13 +16,13 @@ fenetre =Tk()
 def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
 def affichage_tkinter():
-    global case_nombre_mesure, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature
+    global case_nombre_mesure, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite
     #############################menu déroulant  ###############################
     bar_de_menu = Menu(fenetre)
 
     Menu_fichier = Menu(bar_de_menu, tearoff=0)
     Menu_fichier.add_command(label = "Enregistrer")
-    Menu_fichier.add_command(   label = "Remise à zéro")
+    Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_separator()
     Menu_fichier.add_command(label = "Quitter", command=exit)
     bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier)
@@ -34,53 +35,75 @@ def affichage_tkinter():
 
     fenetre.config(menu=bar_de_menu)
     #############################zone de commande###############################
-    titre1 =Label(fenetre, text="zone de contrôle")
-    titre1.grid(row=0 ,column=0, columnspan=2)
+    titre1 =Label(fenetre, text="Zone de contrôle").grid(row=0 ,column=1, columnspan=2)
 
     case_nombre_mesure = Spinbox(fenetre, from_=1, to=43200 )# une journe de mesure maximum
-    case_nombre_mesure.grid(row=1 ,column=0)
+    case_nombre_mesure.grid(row=1 ,column=0,columnspan=2)
 
 
-    boutton_demarage = Button(fenetre, text = "Demarer la mesure",command=demarrage)
-    boutton_demarage.grid(row=1 ,column=1)
+    boutton_demarage = Button(fenetre, text = "Demarrer la mesure",command=demarrage, bg="red")
+    boutton_demarage.grid(row=1 ,column=2, columnspan=2)
 
     ##########################zone d'affichage valeur simple####################
 # def Affichage_une_mesure():
-    titre_affichage_une_valeur = Label(fenetre, text="")
-    titre_affichage_une_valeur.grid(row=2   ,column=0, columnspan=2)
+    titre_affichage_une_valeur = Label(fenetre, text="Valeur actuelle").grid(row=2   ,column=1, columnspan=2)
 
-    affichage_temperature_une_valeur = Label(fenetre, text="Temperature :")
-    affichage_temperature_une_valeur.grid(row=3 ,column=0)
+    affichage_temperature_une_valeur = Label(fenetre, text="Temperature :").grid(row=3 ,column=0, columnspan=2)
 
     valeur_temperature = Label(fenetre, text="-")
-    valeur_temperature.grid(row=3, column=1)
+    valeur_temperature.grid(row=3, column=2)
 
-
-    affichage_humidite_une_valeur = Label(fenetre, text="Taux d'humidite :")
-    affichage_humidite_une_valeur.grid(row=4, column=0 )
+    affichage_humidite_une_valeur = Label(fenetre, text="Taux d'humidite :").grid(row=4, column=0, columnspan=2 )
 
     valeur_humidite = Label(fenetre, text="-")
-    valeur_humidite.grid(row=4, column=1)
+    valeur_humidite.grid(row=4, column=2)
 
     ##########################zone d'afichage plusieurs valeurs ################
 # def Affichage_plusieurs_mesures():
-    titre_affichage_plusieurs_valeurs = Label(fenetre, text="Affichage des valeurs")
-    titre_affichage_plusieurs_valeurs.grid(row=5   ,column=0, columnspan=2)
+    titre_affichage_plusieurs_valeurs = Label(fenetre, text="Analyse").grid(row=5   ,column=1, columnspan=2)
 
-    affichage_min_temperature = Label(fenetre, text="Valeurs minimum :")
-    affichage_min_temperature.grid(row=6, column=0)
+    affichage_temperature_plusieurs_valeur = Label(fenetre, text="Temperature :").grid(row=6 ,column=0)
+
+    affichage_min_temperature = Label(fenetre, text="Valeurs minimum :").grid(row=6, column=1)
 
     valeur_min_temperature = Label(fenetre, text="-")
-    valeur_min_temperature.grid(row=7, column=0)
+    valeur_min_temperature.grid(row=7, column=1)
 
-    affichage_max_temperature = Label(fenetre, text="Valeurs maximum :")
-    affichage_max_temperature.grid(row=6, column=1)
+    affichage_max_temperature = Label(fenetre, text="Valeurs maximum :").grid(row=6, column=2)
 
     valeur_max_temperature = Label(fenetre, text="-")
-    valeur_max_temperature.grid(row=7, column=1)
+    valeur_max_temperature.grid(row=7, column=2)
+
+    affichage_moyenne_temperature = Label(fenetre, text="Moyenne :").grid(row=6, column=3)
+
+    valeur_moyenne_temperature = Label(fenetre, text="-")
+    valeur_moyenne_temperature.grid(row=7, column=3)
+
+    ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+    affichage_humidite_plusieurs_valeur = Label(fenetre, text="Taux d'humidite :").grid(row=8, column=0)
+
+    affichage_min_humidite = Label(fenetre, text="Valeurs minimum :").grid(row=8, column=1)
+
+    valeur_min_humidite = Label(fenetre, text="-")
+    valeur_min_humidite.grid(row=9, column=1)
+
+    affichage_max_humidite = Label(fenetre, text="Valeurs maximum :").grid(row=8, column=2)
+
+    valeur_max_humidite = Label(fenetre, text="-")
+    valeur_max_humidite.grid(row=9, column=2)
+
+    affichage_moyenne_humidite = Label(fenetre, text="Moyenne :").grid(row=8, column=3)
+
+    valeur_moyenne_humidite = Label(fenetre, text="-")
+    valeur_moyenne_humidite.grid(row=9, column=3)
 
     fenetre.mainloop()
-
+def remise_a_zero():
+    if askyesno("Attention", "Êtes vous sure de vouloir faire ça?", icon="warning"):
+        liste_variable=[valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite]
+        for i in liste_variable:
+            i.config(text = "-")
+        showinfo("information", "mis à zéro!")
 def recuperation_valeurs():
     global nombre_de_mesures
     nombre_de_mesures=int(case_nombre_mesure.get())
@@ -98,6 +121,7 @@ def configuration():#recherche la connexion serie
 ###########################communication #######################################
 
 def reception():
+    global liste_des_humiditees, liste_des_temperature
     a=0
     communication_serie = serial.Serial(port, 9600)
     while len(liste_des_humiditees)<nombre_de_mesures and len(liste_des_temperature)<nombre_de_mesures:
@@ -139,7 +163,7 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
 ################################# analyse #######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
 def analyse_donnees(valeurs):
-    global maximum, minimum
+    global maximum, minimum, moyenne
     sommes_des_valeurs=0
     for i in range(len(valeurs)):
         sommes_des_valeurs+=valeurs[i]
@@ -147,6 +171,7 @@ def analyse_donnees(valeurs):
     maximum=max(valeurs)
     minimum=min(valeurs)
     Affichage_console(valeurs,moyenne, maximum, minimum)
+
 
     # if inter_exter=="e":
     #     pass #moyennes de saisons
@@ -158,17 +183,21 @@ def demarrage():
     liste_des_humiditees = []
     liste_des_temperature = []
     recuperation_valeurs()
-    simulation_reception()
+    simulation_reception() #
 
-    analyse_donnees(liste_des_humiditees)
-    analyse_donnees(liste_des_temperature)
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]
     valeur_temperature.config( text =  temperature_actuelle)
     valeur_humidite.config( text =  humidite_actuelle)
     if nombre_de_mesures!=1:
+        analyse_donnees(liste_des_temperature)
         valeur_min_temperature.config(text = minimum)
         valeur_max_temperature.config(text = maximum)
+        valeur_moyenne_temperature.config(text = moyenne)
+        analyse_donnees(liste_des_humiditees)
+        valeur_min_humidite.config(text = minimum)
+        valeur_max_humidite.config(text = maximum)
+        valeur_moyenne_humidite.config(text = moyenne)
 
     fenetre.mainloop()
 ######################################debut ####################################

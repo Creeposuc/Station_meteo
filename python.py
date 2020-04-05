@@ -1,10 +1,12 @@
 # import serial
+
 from tkinter import *
 from tkinter.messagebox import *
 import time
 from random import randint
 import csv
 import os
+import datetime
 port="COM4"
 liste_des_humiditees =[]
 liste_des_temperature =[]
@@ -21,7 +23,7 @@ def affichage_tkinter():
     bar_de_menu = Menu(fenetre)
 
     Menu_fichier = Menu(bar_de_menu, tearoff=0)
-    Menu_fichier.add_command(label = "Enregistrer")
+    Menu_fichier.add_command(label = "Enregistrer", command=enregistrement_CSV)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_separator()
     Menu_fichier.add_command(label = "Quitter", command=exit)
@@ -176,6 +178,29 @@ def analyse_donnees(valeurs):
     # if inter_exter=="e":
     #     pass #moyennes de saisons
 
+############################### eregristrement CSV #############################
+def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, dates dans le fichier (avec la except), selectionné l'emplacement, info avec séparation utf8
+    date = datetime.datetime.now()
+    # try:
+    #empacement =
+    with open(f"mesure.csv", "a") as csvfile:
+        ecrire = csv.writer(csvfile, delimiter="")
+        date = datetime.datetime.now()
+        ecrire.writerow("Heure,Temperature,Taux_d'humidité")
+        for i in range(len(liste_des_humiditees)):
+            date = datetime.datetime.now()
+            ecrire.writerow(f"{date.hour}:{date.minute}:{date.second},{liste_des_humiditees[i]}C,{liste_des_temperature[i]}%")
+            ecrire.writerow(f"moyenne:{moyenne},minimum:{minimum}, maximum:,{maximum}")
+    # except FileNotFoundError:
+    #     with open(f"mesure.csv", "x") as csvfile:
+    #         ecrire = csv.writer(csvfile, delimiter=" ")
+    #         date = datetime.datetime.now()
+    #         ecrire.writerow("Heure,Temperature,Taux d'humidité")
+    #         for i in range(len(liste_des_humiditees)):
+    #             date = datetime.datetime.now()
+    #             ecrire.writerow(f"{date.hour}:{date.minute}:{date.second},{liste_des_humiditees[i]}C,{liste_des_temperature[i]}%")
+
+
 ##################################demarrage mesure et analyse ##################
 def demarrage():
     # configuration()
@@ -183,7 +208,7 @@ def demarrage():
     liste_des_humiditees = []
     liste_des_temperature = []
     recuperation_valeurs()
-    simulation_reception() #
+    simulation_reception()
 
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]

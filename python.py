@@ -10,6 +10,7 @@ import datetime
 port="COM4"
 liste_des_humiditees =[]
 liste_des_temperature =[]
+liste_des_dates_de_mesures = []
 
 temperature_actuelle=0
 humidite_actuelle=0
@@ -23,7 +24,8 @@ def affichage_tkinter():
     bar_de_menu = Menu(fenetre)
 
     Menu_fichier = Menu(bar_de_menu, tearoff=0)
-    Menu_fichier.add_command(label = "Enregistrer", command=enregistrement_CSV)
+    Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)
+    Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_separator()
     Menu_fichier.add_command(label = "Quitter", command=exit)
@@ -123,7 +125,7 @@ def configuration():#recherche la connexion serie
 ###########################communication #######################################
 
 def reception():
-    global liste_des_humiditees, liste_des_temperature
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     a=0
     communication_serie = serial.Serial(port, 9600)
     while len(liste_des_humiditees)<nombre_de_mesures and len(liste_des_temperature)<nombre_de_mesures:
@@ -131,6 +133,8 @@ def reception():
         valeur = str(valeur)
         print(valeur)
         if ">>>" in valeur:
+            date = datetime.datetime.now()
+            liste_des_dates_de_mesures.append((date.hour,":",date.minute,":",date.second))
             a=0
             a+=1
         elif a==1:
@@ -141,7 +145,7 @@ def reception():
             a=0
 
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
-    global liste_des_humiditees, liste_des_temperature
+    global liste_des_humiditees, liste_des_temperature,liste_des_dates_de_mesures
     a=0
     for i in range(nombre_de_mesures*3):
         if a==0:
@@ -152,6 +156,9 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
             valeur = str(valeur)
             print(valeur)
         if ">>>" in valeur:
+            date = datetime.datetime.now()
+            liste_des_dates_de_mesures.append(str(f"{date.hour}:{date.minute}:{date.second}"))
+            print(str(f"{date.hour}:{date.minute}:{date.second}"))
             a=0
             a+=1
         elif a==1:
@@ -160,7 +167,7 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
         elif a==2:
             liste_des_temperature.append(float(valeur))
             a=0
-            # time.sleep(2)
+            time.sleep(2)
 
 ################################# analyse #######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
@@ -178,28 +185,34 @@ def analyse_donnees(valeurs):
     # if inter_exter=="e":
     #     pass #moyennes de saisons
 
-############################### eregristrement CSV #############################
-def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, dates dans le fichier (avec la except), selectionné l'emplacement, info avec séparation utf8
-    date = datetime.datetime.now()
-    # try:
-    #empacement =
-    with open(f"mesure.csv", "a") as csvfile:
-        ecrire = csv.writer(csvfile, delimiter="")
-        date = datetime.datetime.now()
-        ecrire.writerow("Heure,Temperature,Taux_d'humidité")
-        for i in range(len(liste_des_humiditees)):
-            date = datetime.datetime.now()
-            ecrire.writerow(f"{date.hour}:{date.minute}:{date.second},{liste_des_humiditees[i]}C,{liste_des_temperature[i]}%")
-            ecrire.writerow(f"moyenne:{moyenne},minimum:{minimum}, maximum:,{maximum}")
-    # except FileNotFoundError:
-    #     with open(f"mesure.csv", "x") as csvfile:
-    #         ecrire = csv.writer(csvfile, delimiter=" ")
-    #         date = datetime.datetime.now()
-    #         ecrire.writerow("Heure,Temperature,Taux d'humidité")
-    #         for i in range(len(liste_des_humiditees)):
-    #             date = datetime.datetime.now()
-    #             ecrire.writerow(f"{date.hour}:{date.minute}:{date.second},{liste_des_humiditees[i]}C,{liste_des_temperature[i]}%")
+############################### eregristrement #################################
+def enregistrement_texte():
+    if len(liste_des_humiditees)==0:
+        showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
+    else:
+        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur, cette nouvelle mesure y sera ajouté.", icon="info"):
+            with open(f"mesure-{date.day}/{date.month}/{date.year}.txt", "a") as fichier_texte:
+                date = datetime.datetime.now()
+                fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
+                for i in range(len(liste_des_humiditees)):
+                    fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}C   Température: {liste_des_temperature[i]}%\n")
+                if len(liste_des_humiditees)!=1:
+                    fichier_texte.write(f"moyenne:{moyenne}  minimum:{minimum}  maximum:{maximum}\n")
 
+def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
+    # try:
+    if len(liste_des_humiditees)==0:
+        showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
+    else:
+        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur, cette nouvelle mesure y sera ajouté.", icon="info"):
+            with open("mesure.csv", "a") as ficher_csv:
+                ecrire = csv.writer(ficher_csv, delimiter=" ")
+                ecrire.writerow("")
+                ecrire.writerow("Heure,Temperature,Taux d'humidite")
+                for i in range(len(liste_des_humiditees)):
+                    ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}C,{liste_des_temperature[i]}%")
+                if len(liste_des_humiditees)!=1:
+                    ecrire.writerow(f"moyenne:{moyenne},minimum:{minimum},maximum:{maximum}")
 
 ##################################demarrage mesure et analyse ##################
 def demarrage():
@@ -207,6 +220,7 @@ def demarrage():
     global liste_des_humiditees, liste_des_temperature
     liste_des_humiditees = []
     liste_des_temperature = []
+    liste_des_dates_de_mesures = []
     recuperation_valeurs()
     simulation_reception()
 

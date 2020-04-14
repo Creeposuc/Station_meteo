@@ -18,3 +18,7 @@ date: 8/4/2020
 21:17:56 >>> humidité: 78.0C   Température: 59.0%
 21:17:58 >>> humidité: 21.0C   Température: 43.0%
 moyenne:49.5,minimum:21.0,maximum:78.0
+date: 14/4/2020
+14h12m15s >>> humidité: 93.0C   Température: 73.0%
+14h12m17s >>> humidité: 9.0C   Température: 33.0%
+moyenne:51.0  minimum:9.0  maximum:93.0

@@ -1,5 +1,5 @@
-# import serial
-
+import serial
+import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter.messagebox import *
 import time
@@ -111,6 +111,16 @@ def remise_a_zero():
 def recuperation_valeurs():
     global nombre_de_mesures
     nombre_de_mesures=int(case_nombre_mesure.get())
+
+def graphique(liste1, liste2, liste_des_dates_de_mesures):
+    print("liste de dates graph:", liste_des_dates_de_mesures)
+    plt.title("Température et Taux d'humididté")
+    plt.plot(liste_des_dates_de_mesures, liste1)
+    plt.plot(liste_des_dates_de_mesures, liste2)
+    plt.xlabel("Heure")
+    plt.ylabel("valeur")
+    plt.show()
+
 #########################initialisation########################################
 
 def configuration():#recherche la connexion serie
@@ -128,13 +138,13 @@ def reception():
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     a=0
     communication_serie = serial.Serial(port, 9600)
-    while len(liste_des_humiditees)<nombre_de_mesures and len(liste_des_temperature)<nombre_de_mesures:
+    for i in range(nombre_de_mesures*3):
         valeur = communication_serie.readline()
         valeur = str(valeur)
-        print(valeur)
         if ">>>" in valeur:
             date = datetime.datetime.now()
-            liste_des_dates_de_mesures.append((date.hour,":",date.minute,":",date.second))
+            liste_des_dates_de_mesures.append(str(f"{date.hour}h{date.minute}m{date.second}s"))
+            print(str(f"{date.hour}h{date.minute}m{date.second}s"))
             a=0
             a+=1
         elif a==1:
@@ -143,11 +153,12 @@ def reception():
         elif a==2:
             liste_des_temperature.append(float(valeur[2:][:5]))
             a=0
-
+        print(valeur)
+    print("liste de dates:", liste_des_dates_de_mesures)
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
-    global liste_des_humiditees, liste_des_temperature,liste_des_dates_de_mesures
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     a=0
-    for i in range(nombre_de_mesures*3):
+    for i in range(nombre_de_mesures*4):
         if a==0:
             valeur = ">>>"
             print(">>>")
@@ -157,8 +168,9 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
             print(valeur)
         if ">>>" in valeur:
             date = datetime.datetime.now()
-            liste_des_dates_de_mesures.append(str(f"{date.hour}:{date.minute}:{date.second}"))
-            print(str(f"{date.hour}:{date.minute}:{date.second}"))
+            liste_des_dates_de_mesures.append(str(f"{date.hour}h{date.minute}m{date.second}s"))
+            print(str(f"{date.hour}h{date.minute}m{date.second}s"))
+
             a=0
             a+=1
         elif a==1:
@@ -168,6 +180,7 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
             liste_des_temperature.append(float(valeur))
             a=0
             time.sleep(2)
+    print("liste de dates:", liste_des_dates_de_mesures)
 
 ################################# analyse #######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
@@ -181,17 +194,16 @@ def analyse_donnees(valeurs):
     minimum=min(valeurs)
     Affichage_console(valeurs,moyenne, maximum, minimum)
 
-
     # if inter_exter=="e":
     #     pass #moyennes de saisons
 
-############################### eregristrement #################################
+############################### eregristrement ################################# def enregistrement_texte():
 def enregistrement_texte():
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
     else:
         if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur, cette nouvelle mesure y sera ajouté.", icon="info"):
-            with open(f"mesure-{date.day}/{date.month}/{date.year}.txt", "a") as fichier_texte:
+            with open(f"mesure.txt", "a") as fichier_texte:
                 date = datetime.datetime.now()
                 fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
                 for i in range(len(liste_des_humiditees)):
@@ -217,12 +229,12 @@ def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionn�
 ##################################demarrage mesure et analyse ##################
 def demarrage():
     # configuration()
-    global liste_des_humiditees, liste_des_temperature
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     liste_des_humiditees = []
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
     recuperation_valeurs()
-    simulation_reception()
+    reception()
 
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]
@@ -237,7 +249,8 @@ def demarrage():
         valeur_min_humidite.config(text = minimum)
         valeur_max_humidite.config(text = maximum)
         valeur_moyenne_humidite.config(text = moyenne)
-
+    print("liste de dates:", liste_des_dates_de_mesures)
+    graphique(liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures)
     fenetre.mainloop()
 ######################################debut ####################################
 affichage_tkinter()

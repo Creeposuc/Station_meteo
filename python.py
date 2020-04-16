@@ -101,6 +101,10 @@ def affichage_tkinter():
     valeur_moyenne_humidite = Label(fenetre, text="-")
     valeur_moyenne_humidite.grid(row=9, column=3)
 
+    ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
+    bouton_graph = Button(fenetre, text = "Afficher le graphique",command=graphique_redirection, bg="blue")
+    bouton_graph.grid(row=10 ,column=0, columnspan=4)
+
     fenetre.mainloop()
 def remise_a_zero():
     if askyesno("Attention", "Êtes vous sure de vouloir faire ça?", icon="warning"):
@@ -115,12 +119,19 @@ def recuperation_valeurs():
 def graphique(liste1, liste2, liste_des_dates_de_mesures):
     print("liste de dates graph:", liste_des_dates_de_mesures)
     plt.title("Température et Taux d'humididté")
-    plt.plot(liste_des_dates_de_mesures, liste1)
-    plt.plot(liste_des_dates_de_mesures, liste2)
+    plt.plot(liste_des_dates_de_mesures, liste1, label="Taux d'humidité", marker="+")
+    plt.plot(liste_des_dates_de_mesures, liste2, label="Température", marker="+")
     plt.xlabel("Heure")
     plt.ylabel("valeur")
+    plt.legend()
+    plt.grid(True)
     plt.show()
 
+def graphique_redirection():
+    if len(liste_des_humiditees)<=1:
+        showinfo("Valeurs vide !", "Vous n'avez pas mesuré assé de valeur pour afficher le graphique")
+    else:
+        graphique(liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures)
 #########################initialisation########################################
 
 def configuration():#recherche la connexion serie
@@ -158,7 +169,7 @@ def reception():
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     a=0
-    for i in range(nombre_de_mesures*4):
+    for i in range(nombre_de_mesures*3):
         if a==0:
             valeur = ">>>"
             print(">>>")
@@ -234,7 +245,7 @@ def demarrage():
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
     recuperation_valeurs()
-    reception()
+    simulation_reception()
 
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]
@@ -250,7 +261,7 @@ def demarrage():
         valeur_max_humidite.config(text = maximum)
         valeur_moyenne_humidite.config(text = moyenne)
     print("liste de dates:", liste_des_dates_de_mesures)
-    graphique(liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures)
+
     fenetre.mainloop()
 ######################################debut ####################################
 affichage_tkinter()

@@ -105,6 +105,8 @@ def affichage_tkinter():
     bouton_graph = Button(fenetre, text = "Afficher le graphique",command=graphique_redirection, bg="blue")
     bouton_graph.grid(row=10 ,column=0, columnspan=4)
 
+    
+
     fenetre.mainloop()
 def remise_a_zero():
     if askyesno("Attention", "Êtes vous sure de vouloir faire ça?", icon="warning"):
@@ -118,10 +120,12 @@ def recuperation_valeurs():
 
 def graphique(liste1, liste2, liste_des_dates_de_mesures):
     print("liste de dates graph:", liste_des_dates_de_mesures)
+    valeur_moyenne_temperature.cget("text")
     plt.title("Température et Taux d'humididté")
     plt.plot(liste_des_dates_de_mesures, liste1, label="Taux d'humidité", marker="+")
-    plt.plot(liste_des_dates_de_mesures, liste2, label="Température", marker="+")
     plt.xlabel("Heure")
+    #plt.annotate('maximum', xy=(liste_des_temperature.index(valeur_max_temperature.cget("text")), valeur_max_temperature.cget("text")), xytext=(liste_des_temperature.index(valeur_max_temperature.cget("text"))-5, valeur_max_temperature.cget("text")-2))
+    plt.plot(liste_des_dates_de_mesures, liste2, label="Température", marker="+")
     plt.ylabel("valeur")
     plt.legend()
     plt.grid(True)
@@ -261,7 +265,6 @@ def demarrage():
         valeur_max_humidite.config(text = maximum)
         valeur_moyenne_humidite.config(text = moyenne)
     print("liste de dates:", liste_des_dates_de_mesures)
-
     fenetre.mainloop()
 ######################################debut ####################################
 affichage_tkinter()

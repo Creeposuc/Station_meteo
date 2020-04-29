@@ -1,4 +1,4 @@
-import serial
+#import serial
 import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter.messagebox import *
@@ -105,7 +105,7 @@ def affichage_tkinter():
     bouton_graph = Button(fenetre, text = "Afficher le graphique",command=graphique_redirection, bg="blue")
     bouton_graph.grid(row=10 ,column=0, columnspan=4)
 
-    
+
 
     fenetre.mainloop()
 def remise_a_zero():
@@ -119,14 +119,12 @@ def recuperation_valeurs():
     nombre_de_mesures=int(case_nombre_mesure.get())
 
 def graphique(liste1, liste2, liste_des_dates_de_mesures):
-    print("liste de dates graph:", liste_des_dates_de_mesures)
     valeur_moyenne_temperature.cget("text")
     plt.title("Température et Taux d'humididté")
     plt.plot(liste_des_dates_de_mesures, liste1, label="Taux d'humidité", marker="+")
-    plt.xlabel("Heure")
-    #plt.annotate('maximum', xy=(liste_des_temperature.index(valeur_max_temperature.cget("text")), valeur_max_temperature.cget("text")), xytext=(liste_des_temperature.index(valeur_max_temperature.cget("text"))-5, valeur_max_temperature.cget("text")-2))
     plt.plot(liste_des_dates_de_mesures, liste2, label="Température", marker="+")
     plt.ylabel("valeur")
+    plt.xlabel("Heure")
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -222,9 +220,9 @@ def enregistrement_texte():
                 date = datetime.datetime.now()
                 fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
                 for i in range(len(liste_des_humiditees)):
-                    fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}C   Température: {liste_des_temperature[i]}%\n")
-                if len(liste_des_humiditees)!=1:
-                    fichier_texte.write(f"moyenne:{moyenne}  minimum:{minimum}  maximum:{maximum}\n")
+                    fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
+                # if len(liste_des_humiditees)!=1:
+                #     fichier_texte.write(f"moyenne:{moyenne}  minimum:{minimum}  maximum:{maximum}\n")
 
 def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
     # try:
@@ -235,11 +233,11 @@ def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionn�
             with open("mesure.csv", "a") as ficher_csv:
                 ecrire = csv.writer(ficher_csv, delimiter=" ")
                 ecrire.writerow("")
-                ecrire.writerow("Heure,Temperature,Taux d'humidite")
+                ecrire.writerow("Heure,Taux_d'humidite,Temperature")
                 for i in range(len(liste_des_humiditees)):
-                    ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}C,{liste_des_temperature[i]}%")
-                if len(liste_des_humiditees)!=1:
-                    ecrire.writerow(f"moyenne:{moyenne},minimum:{minimum},maximum:{maximum}")
+                    ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}%,{liste_des_temperature[i]}C")
+                # if len(liste_des_humiditees)!=1:
+                #     ecrire.writerow(f"moyenne:{moyenne},minimum:{minimum},maximum:{maximum}")
 
 ##################################demarrage mesure et analyse ##################
 def demarrage():

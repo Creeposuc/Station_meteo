@@ -20,13 +20,13 @@ fenetre =Tk()
 def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
 def affichage_tkinter():
-    global case_nombre_mesure, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite
+    global case_dure_mesures,case_nombre_mesure_temps, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite
     #############################menu déroulant  ###############################
     bar_de_menu = Menu(fenetre)
 
     Menu_fichier = Menu(bar_de_menu, tearoff=0)
-    Menu_fichier.add_command(label = "Enregistrer en csv", command=redirection_CSV)
-    Menu_fichier.add_command(label = "Enregistrer en texte", command=redirection_txt)
+    Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)
+    Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_separator()
     Menu_fichier.add_command(label = "Quitter", command=exit)
@@ -43,77 +43,100 @@ def affichage_tkinter():
     #nom_ducadre=Frame(fenetre, borderwidth=4, relief=GROOVE).grid(....)
     #titre1 =Label(Frame, text="Zone de contrôle").grid(row=0 ,column=0, columnspan=4)
     #############################zone de commande###############################
+    cadre_zone_controle = Frame(fenetre, borderwidth=5, relief=GROOVE)
+    cadre_zone_controle.grid(row=1, column=0)
 
-    zone_controle = Frame(fenetre, borderwidth=4, relief=SUNKEN, background="green").grid(row=1, column=0)##########################################################################################################################
+    titre1 =Label(cadre_zone_controle, text="Zone de contrôle").grid(row=0, column=0, columnspan=3)
 
-    titre1 =Label(zone_controle, text="Zone de contrôle").grid(row=0 ,column=0, columnspan=4)
+    ########################################radio ########################################################
+    value=StringVar()
+    value.set("seconde")
+    cadre_boutton_radio = Frame(cadre_zone_controle, borderwidth=3, relief=GROOVE)
+    cadre_boutton_radio.grid(row=1, column=0, columnspan=3)
 
-    titre_case_nombre_mesure = Label(zone_controle, text="Durée de la mesure (en minutes):").grid(row=1, column=0)
+    titre_boutton_radio = Label(cadre_boutton_radio, text="Votre mesure dure :")
+    titre_boutton_radio.grid(row=0, column=0, columnspan=3)
 
-    titre_case_nombre_mesure_temps = Label(zone_controle, text="Nombres de mesures par minutes :").grid(row=1, column=1)
+    radio_moin_minute = Radiobutton(cadre_boutton_radio, text="Moin d'une minute", variable=value, value="seconde")
+    radio_moin_minute.grid(row=1, column=0)
 
-    case_dure_mesure = Spinbox(zone_controle, from_=1, to=43200 )# une journe de mesure maximum
-    case_dure_mesure.grid(row=2 ,column=0)
+    radio_moin_heure = Radiobutton(cadre_boutton_radio, text="Moin d'une heure", variable=value, value="minute")
+    radio_moin_heure.grid(row=1, column=1)
 
-    case_nombre_mesure_temps = Spinbox(zone_controle, from_=1, to=43200 )# une journe de mesure maximum
-    case_nombre_mesure_temps.grid(row=2 ,column=1)
+    radio_moin_journe = Radiobutton(cadre_boutton_radio, text="Moin d'une journée", variable=value, value="heure")
+    radio_moin_journe.grid(row=1, column=2)
+    ########################################fin radio###############################################################
+
+    titre_case_nombre_mesure = Label(cadre_zone_controle, text="Durée de la mesure (en minutes):").grid(row=2, column=0)
+
+    titre_case_nombre_mesure_temps = Label(cadre_zone_controle, text="Nombres de mesures par minutes :").grid(row=2, column=1)
+
+    case_dure_mesures = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
+    case_dure_mesures.grid(row=3 ,column=0)
+
+    case_nombre_mesure_temps = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
+    case_nombre_mesure_temps.grid(row=3 ,column=1)
 
 
-    boutton_demarage = Button(zone_controle, text = "Demarrer la mesure",command=demarrage, bg="red")
-    boutton_demarage.grid(row=2 ,column=2, columnspan=2)
+    boutton_demarage = Button(cadre_zone_controle, text = "Demarrer la mesure",command=demarrage, bg="red")
+    boutton_demarage.grid(row=3 ,column=2)
 
     ##########################zone d'affichage valeur simple####################
-# def Affichage_une_mesure():
-    titre_affichage_une_valeur = Label(fenetre, text="Valeur actuelle").grid(row=3   ,column=0, columnspan=4)
+    cadre_valeur_actuelle = Frame(fenetre, borderwidth=5, relief=GROOVE)
+    cadre_valeur_actuelle.grid(row=2, column=0)
 
-    affichage_temperature_une_valeur = Label(fenetre, text="Temperature :").grid(row=4 ,column=0)
+    titre_affichage_une_valeur = Label(cadre_valeur_actuelle, text="Valeur actuelle").grid(row=3   ,column=0, columnspan=4)
 
-    valeur_temperature = Label(fenetre, text="-")
+    affichage_temperature_une_valeur = Label(cadre_valeur_actuelle, text="Temperature :").grid(row=4 ,column=0)
+
+    valeur_temperature = Label(cadre_valeur_actuelle, text="-")
     valeur_temperature.grid(row=4, column=1)
 
-    affichage_humidite_une_valeur = Label(fenetre, text="Taux d'humidite :").grid(row=5, column=0)
+    affichage_humidite_une_valeur = Label(cadre_valeur_actuelle, text="Taux d'humidite :").grid(row=5, column=0)
 
-    valeur_humidite = Label(fenetre, text="-")
+    valeur_humidite = Label(cadre_valeur_actuelle, text="-")
     valeur_humidite.grid(row=5, column=1)
 
-    ##########################zone d'afichage plusieurs valeurs ################
-# def Affichage_plusieurs_mesures():
-    titre_affichage_plusieurs_valeurs = Label(fenetre, text="Analyse").grid(row=6   ,column=0, columnspan=4)
+ ##########################zone d'afichage plusieurs valeurs ################
+    cadre_analyse = Frame(fenetre, borderwidth=5, relief=GROOVE)
+    cadre_analyse.grid(row=3, column=0)
 
-    affichage_temperature_plusieurs_valeur = Label(fenetre, text="Temperature :").grid(row=7 ,column=0)
+    titre_affichage_plusieurs_valeurs = Label(cadre_analyse, text="Analyse").grid(row=6   ,column=0, columnspan=4)
 
-    affichage_min_temperature = Label(fenetre, text="Valeurs minimum :").grid(row=7, column=1)
+    affichage_temperature_plusieurs_valeur = Label(cadre_analyse, text="Temperature :").grid(row=7 ,column=0)
 
-    valeur_min_temperature = Label(fenetre, text="-")
+    affichage_min_temperature = Label(cadre_analyse, text="Valeurs minimum :").grid(row=7, column=1)
+
+    valeur_min_temperature = Label(cadre_analyse, text="-")
     valeur_min_temperature.grid(row=8, column=1)
 
-    affichage_max_temperature = Label(fenetre, text="Valeurs maximum :").grid(row=7, column=2)
+    affichage_max_temperature = Label(cadre_analyse, text="Valeurs maximum :").grid(row=7, column=2)
 
-    valeur_max_temperature = Label(fenetre, text="-")
+    valeur_max_temperature = Label(cadre_analyse, text="-")
     valeur_max_temperature.grid(row=8, column=2)
 
-    affichage_moyenne_temperature = Label(fenetre, text="Moyenne :").grid(row=7, column=3)
+    affichage_moyenne_temperature = Label(cadre_analyse, text="Moyenne :").grid(row=7, column=3)
 
-    valeur_moyenne_temperature = Label(fenetre, text="-")
+    valeur_moyenne_temperature = Label(cadre_analyse, text="-")
     valeur_moyenne_temperature.grid(row=8, column=3)
 
-    ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
-    affichage_humidite_plusieurs_valeur = Label(fenetre, text="Taux d'humidite :").grid(row=9, column=0)
+# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+    affichage_humidite_plusieurs_valeur = Label(cadre_analyse, text="Taux d'humidite :").grid(row=9, column=0)
 
-    affichage_min_humidite = Label(fenetre, text="Valeurs minimum :").grid(row=9, column=1)
+    affichage_min_humidite = Label(cadre_analyse, text="Valeurs minimum :").grid(row=9, column=1)
 
 
-    valeur_min_humidite = Label(fenetre, text="-")
+    valeur_min_humidite = Label(cadre_analyse, text="-")
     valeur_min_humidite.grid(row=10, column=1)
 
-    affichage_max_humidite = Label(fenetre, text="Valeurs maximum :").grid(row=9, column=2)
+    affichage_max_humidite = Label(cadre_analyse, text="Valeurs maximum :").grid(row=9, column=2)
 
-    valeur_max_humidite = Label(fenetre, text="-")
+    valeur_max_humidite = Label(cadre_analyse, text="-")
     valeur_max_humidite.grid(row=10, column=2)
 
-    affichage_moyenne_humidite = Label(fenetre, text="Moyenne :").grid(row=9, column=3)
+    affichage_moyenne_humidite = Label(cadre_analyse, text="Moyenne :").grid(row=9, column=3)
 
-    valeur_moyenne_humidite = Label(fenetre, text="-")
+    valeur_moyenne_humidite = Label(cadre_analyse, text="-")
     valeur_moyenne_humidite.grid(row=10, column=3)
 
     ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
@@ -124,7 +147,7 @@ def affichage_tkinter():
 
 def popup_enregistrement(extension):
     global emplacement
-    emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures") # initialdir=
+    emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures")
 
 def remise_a_zero():
     if askyesno("Attention", "Êtes vous sure de vouloir faire ça?", icon="warning"):
@@ -133,15 +156,23 @@ def remise_a_zero():
             i.config(text = "-")
         showinfo("information", "mis à zéro!")
 def recuperation_valeurs():#######################################################################################################################
-    global nombre_de_mesures
-    nombre_de_mesures=int(case_dure_mesure.get())
+    global nombre_de_mesures, espacement_mesures
+    dure_mesure=int(case_dure_mesures.get())
+    print(dure_mesure)
     mesure_par_minute=int(case_nombre_mesure_temps.get())
-
+    print(mesure_par_minute)
+    nombre_de_mesures = int(dure_mesure*mesure_par_minute)
+    print(nombre_de_mesures)
+    espacement_mesures=float(round(60/mesure_par_minute,3))
+    print(espacement_mesures)
 def graphique(liste1, liste2, liste_des_dates_de_mesures):
     valeur_moyenne_temperature.cget("text")
-    plt.title("Température et Taux d'humididté")
-    plt.plot(liste_des_dates_de_mesures, liste1, label="Taux d'humidité", marker="+")
-    plt.plot(liste_des_dates_de_mesures, liste2, label="Température", marker="+")
+    liste_numeros_des_mesures = []
+    for i in range(nombre_de_mesures):
+        liste_numeros_des_mesures.append(i+1)
+    plt.title(f"Température et Taux d'humididté à partir de {liste_des_dates_de_mesures[0]}")
+    plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité", marker="+")
+    plt.plot(liste_numeros_des_mesures, liste2, label="Température", marker="+")
     plt.ylabel("valeur")
     plt.xlabel("Heure")
     plt.legend()
@@ -211,7 +242,7 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
         elif a==2:
             liste_des_temperature.append(float(valeur))
             a=0
-            time.sleep(2)
+            time.sleep(espacement_mesures)
     print("liste de dates:", liste_des_dates_de_mesures)
 
 ################################# analyse #######################################
@@ -231,29 +262,26 @@ def analyse_donnees(valeurs):
 
 ############################### eregristrement #################################
 
-def redirection_txt():
-    popup_enregistrement("txt")
-    enregistrement_texte(emplacement)
-def enregistrement_texte(emplacement):
+def enregistrement_texte():
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
     else:
-        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur, cette nouvelle mesure y sera ajouté.", icon="info"):
+        popup_enregistrement("txt")
+        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement, cette nouvelle mesure y sera ajouté.", icon="info"):
             with open(emplacement, "a") as fichier_texte:
                 date = datetime.datetime.now()
                 fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
                 for i in range(len(liste_des_humiditees)):
                     fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
 
-def redirection_CSV():
-    popup_enregistrement("csv")
-    enregistrement_CSV(emplacement)
-def enregistrement_CSV(emplacement):#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
+
+def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
     # try:
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
     else:
-        # if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur, cette nouvelle mesure y sera ajouté.", icon="info"):
+        # if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement, cette nouvelle mesure y sera ajouté.", icon="info"):
+        popup_enregistrement("csv")
         with open(emplacement, "a") as ficher_csv:
             ecrire = csv.writer(ficher_csv, delimiter=" ")
             ecrire.writerow("")
@@ -269,7 +297,7 @@ def demarrage():
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
     recuperation_valeurs()
-    simulation_reception()#######################################################################################################################
+    simulation_reception()
 
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]

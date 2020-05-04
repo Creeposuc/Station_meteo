@@ -16,11 +16,12 @@ liste_des_dates_de_mesures = []
 temperature_actuelle=0
 humidite_actuelle=0
 fenetre =Tk()
+# historique=Tk()
 ###########################  Affichage   #######################################
 def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
 def affichage_tkinter():
-    global case_dure_mesures,case_nombre_mesure_temps, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite
+    global case_dure_mesures, case_intervalle, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite, value
     #############################menu déroulant  ###############################
     bar_de_menu = Menu(fenetre)
 
@@ -49,33 +50,33 @@ def affichage_tkinter():
     titre1 =Label(cadre_zone_controle, text="Zone de contrôle").grid(row=0, column=0, columnspan=3)
 
     ########################################radio ########################################################
-    value=StringVar()
-    value.set("seconde")
+    value=IntVar()
+    value.set(1)
     cadre_boutton_radio = Frame(cadre_zone_controle, borderwidth=3, relief=GROOVE)
     cadre_boutton_radio.grid(row=1, column=0, columnspan=3)
 
-    titre_boutton_radio = Label(cadre_boutton_radio, text="Votre mesure dure :")
+    titre_boutton_radio = Label(cadre_boutton_radio, text="En quelle unitée est votre mesure ?")
     titre_boutton_radio.grid(row=0, column=0, columnspan=3)
 
-    radio_moin_minute = Radiobutton(cadre_boutton_radio, text="Moin d'une minute", variable=value, value="seconde")
-    radio_moin_minute.grid(row=1, column=0)
+    radio_seconde = Radiobutton(cadre_boutton_radio, text="En secondes", variable=value, value=1)
+    radio_seconde.grid(row=1, column=0)
 
-    radio_moin_heure = Radiobutton(cadre_boutton_radio, text="Moin d'une heure", variable=value, value="minute")
-    radio_moin_heure.grid(row=1, column=1)
+    radio_minute = Radiobutton(cadre_boutton_radio, text="En minutes", variable=value, value=60)
+    radio_minute.grid(row=1, column=1)
 
-    radio_moin_journe = Radiobutton(cadre_boutton_radio, text="Moin d'une journée", variable=value, value="heure")
-    radio_moin_journe.grid(row=1, column=2)
+    radio_heure = Radiobutton(cadre_boutton_radio, text="En heures", variable=value, value=3600)
+    radio_heure.grid(row=1, column=2)
     ########################################fin radio###############################################################
 
-    titre_case_nombre_mesure = Label(cadre_zone_controle, text="Durée de la mesure (en minutes):").grid(row=2, column=0)
+    titre_case_nombre_mesure = Label(cadre_zone_controle, text="Durée de la mesure :").grid(row=2, column=0)
 
-    titre_case_nombre_mesure_temps = Label(cadre_zone_controle, text="Nombres de mesures par minutes :").grid(row=2, column=1)
+    titre_case_nombre_mesure_temps = Label(cadre_zone_controle, text="Intervalle de temps entre deux mesures :").grid(row=2, column=1)
 
     case_dure_mesures = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
     case_dure_mesures.grid(row=3 ,column=0)
 
-    case_nombre_mesure_temps = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
-    case_nombre_mesure_temps.grid(row=3 ,column=1)
+    case_intervalle = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
+    case_intervalle.grid(row=3 ,column=1)
 
 
     boutton_demarage = Button(cadre_zone_controle, text = "Demarrer la mesure",command=demarrage, bg="red")
@@ -97,7 +98,7 @@ def affichage_tkinter():
     valeur_humidite = Label(cadre_valeur_actuelle, text="-")
     valeur_humidite.grid(row=5, column=1)
 
- ##########################zone d'afichage plusieurs valeurs ################
+    ##########################zone d'afichage plusieurs valeurs ################
     cadre_analyse = Frame(fenetre, borderwidth=5, relief=GROOVE)
     cadre_analyse.grid(row=3, column=0)
 
@@ -120,7 +121,7 @@ def affichage_tkinter():
     valeur_moyenne_temperature = Label(cadre_analyse, text="-")
     valeur_moyenne_temperature.grid(row=8, column=3)
 
-# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+    # ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
     affichage_humidite_plusieurs_valeur = Label(cadre_analyse, text="Taux d'humidite :").grid(row=9, column=0)
 
     affichage_min_humidite = Label(cadre_analyse, text="Valeurs minimum :").grid(row=9, column=1)
@@ -145,6 +146,10 @@ def affichage_tkinter():
 
     fenetre.mainloop()
 
+def historique():
+    historique.mainloop()
+
+    
 def popup_enregistrement(extension):
     global emplacement
     emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures")
@@ -155,16 +160,17 @@ def remise_a_zero():
         for i in liste_variable:
             i.config(text = "-")
         showinfo("information", "mis à zéro!")
-def recuperation_valeurs():#######################################################################################################################
-    global nombre_de_mesures, espacement_mesures
+
+def recuperation_valeurs():
+    global nombre_de_mesures
     dure_mesure=int(case_dure_mesures.get())
     print(dure_mesure)
-    mesure_par_minute=int(case_nombre_mesure_temps.get())
-    print(mesure_par_minute)
-    nombre_de_mesures = int(dure_mesure*mesure_par_minute)
+    intervalle_temps=int(case_intervalle.get())
+    print(intervalle_temps)
+    valeur=int(value.get())
+    nombre_de_mesures = int(dure_mesure*int(valeur)/intervalle_temps)
     print(nombre_de_mesures)
-    espacement_mesures=float(round(60/mesure_par_minute,3))
-    print(espacement_mesures)
+
 def graphique(liste1, liste2, liste_des_dates_de_mesures):
     valeur_moyenne_temperature.cget("text")
     liste_numeros_des_mesures = []
@@ -217,7 +223,9 @@ def reception():
             liste_des_temperature.append(float(valeur[2:][:5]))
             a=0
         print(valeur)
+        time.sleep(int(case_intervalle.get())) #####################################################################################################################################################
     print("liste de dates:", liste_des_dates_de_mesures)
+
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     a=0
@@ -242,7 +250,7 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
         elif a==2:
             liste_des_temperature.append(float(valeur))
             a=0
-            time.sleep(espacement_mesures)
+            time.sleep(int(case_intervalle.get()))
     print("liste de dates:", liste_des_dates_de_mesures)
 
 ################################# analyse #######################################

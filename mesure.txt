@@ -1,7 +1,0 @@
-date: 29/4/2020
-13h49m11s >>> humidité: 58.0%   Température: 79.0C
-13h49m13s >>> humidité: 96.0%   Température: 84.0C
-13h49m15s >>> humidité: 78.0%   Température: 35.0C
-date: 29/4/2020
-13h57m27s >>> humidité: 91.0%   Température: 1.0C
-13h57m29s >>> humidité: 75.0%   Température: 76.0C

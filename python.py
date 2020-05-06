@@ -12,11 +12,11 @@ port="COM4"
 liste_des_humiditees =[]
 liste_des_temperature =[]
 liste_des_dates_de_mesures = []
-
+enregistrement=int(0)
 temperature_actuelle=0
 humidite_actuelle=0
 fenetre =Tk()
-# historique=Tk()
+
 ###########################  Affichage   #######################################
 def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
@@ -29,8 +29,10 @@ def affichage_tkinter():
     Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)
     Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
+    Menu_fichier.add_command(label = "Historique", command=historique)
+    Menu_fichier.add_command(label = "préference", command=preference)
     Menu_fichier.add_separator()
-    Menu_fichier.add_command(label = "Quitter", command=exit)
+    Menu_fichier.add_command(label = "Quitter", command=quitter)
     bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier)
 
     Menu_aide = Menu(bar_de_menu, tearoff=0)
@@ -146,10 +148,81 @@ def affichage_tkinter():
 
     fenetre.mainloop()
 
-def historique():
-    historique.mainloop()
+def quitter():
+    print(enregistrement)
+    if enregistrement==0:
+        if askyesno("Attention", "Aucunes mersures ne sera sauvegardées", icon="warning"):
+            exit()
+    elif enregistrement==1:#les mesures ont été enregistrées
+        exit()
 
-    
+def preference():
+    preference=Tk()
+    titre_preference = Label(preference, text="Préférence de l'affichage",font=("bold",16)).grid(row=0, column=0)
+
+    cadre_preference = Frame(preference, borderwidth=5, relief=GROOVE)
+    cadre_preference.grid(row=1, column=0)
+
+    titre_couleur_boutton = Label(cadre_preference, text="Couleur des bouttons :").grid(row=0, column=0)
+    couleur=StringVar()
+    couleur.set("red")
+    boutton_rouge = Radiobutton(cadre_preference, text="Rouge",variable=couleur, value="red")
+    boutton_rouge.grid(row=1, column=0)
+    boutton_vert = Radiobutton(cadre_preference, text="Vert",variable=couleur, value="vert")
+    boutton_vert.grid(row=2, column=0)
+    boutton_bleu = Radiobutton(cadre_preference, text="bleu",variable=couleur, value="bleu")
+    boutton_bleu.grid(row=3, column=0)
+    boutton_jaune = Radiobutton(cadre_preference, text="Jaune",variable=couleur, value="jaune")
+    boutton_jaune.grid(row=4, column=0)
+
+
+    boutton_appliquer = Button(preference, text="Appliquer", command=appliquer_preference, bg="red").grid(row=2, column=0)
+
+    preference.mainloop()
+def appliquer_preference():
+    pass
+def historique():
+    global date_recherche_selectionne, boutton_recherche
+
+    historique=Tk()
+    titre_historique = Label(historique, text="Historique", font=("bold",16)).grid(row=0, column=0)
+
+    cadre_recherche = Frame(historique, borderwidth=5, relief=GROOVE)
+    cadre_recherche.grid(row=1, column=0)
+    titre_recherche = Label(cadre_recherche, text="Rechercher dans l'historique par date:").grid(row=0, column=0, columnspan=2)
+
+
+    date_recherche_selectionne=StringVar()
+    zone_de_recherche =  Entry(cadre_recherche, textvariable=date_recherche_selectionne ,width=19)
+    zone_de_recherche.grid(row=1, column=0)
+    date_recherche_selectionne.set("date")
+
+    boutton_recherche = Button(cadre_recherche, text="Rechercher", command=recherche_historique, bg="red").grid(row=1, column=1)
+
+    cadre_historique = Frame(historique, borderwidth=5, relief=GROOVE)
+    cadre_historique.grid(row=2, column=0)
+    affichage_resultat = Text(cadre_historique, width=50, height=30).grid(row=0, column=0)
+
+    historique.mainloop()
+def sauvergarde_historique():
+    with open("Historiques_des_valeurs_mesurées", "a") as fichier_texte:
+        date =datetime.datetime.now()
+        fichier_texte.write(f"{date.day} {date.month} {date.year} {date.hour} {date.minute} {date.second}\n")
+        for i in range(len(liste_des_humiditees)):
+            fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
+
+def recherche_historique():
+    date_recherche=date_recherche_selectionne.get()
+    print("recherche de >", date_recherche)
+
+    with open("Historiques_des_valeurs_mesurées", "r") as fichier_texte:
+        for ligne in fichier_texte:
+            if date_recherche==ligne:
+                print("date trouvé")
+        fichier_texte.close()
+    print("fin de la recherche")
+
+
 def popup_enregistrement(extension):
     global emplacement
     emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures")
@@ -271,11 +344,13 @@ def analyse_donnees(valeurs):
 ############################### eregristrement #################################
 
 def enregistrement_texte():
+    global enregistrement
+    enregistrement=1
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
     else:
         popup_enregistrement("txt")
-        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement, cette nouvelle mesure y sera ajouté.", icon="info"):
+        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement avec un même nom, cette nouvelle mesure y sera ajouté.", icon="info"):
             with open(emplacement, "a") as fichier_texte:
                 date = datetime.datetime.now()
                 fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
@@ -283,23 +358,26 @@ def enregistrement_texte():
                     fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
 
 
+
 def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
-    # try:
+    global enregistrement
+    enregistrement=1
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
     else:
-        # if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement, cette nouvelle mesure y sera ajouté.", icon="info"):
-        popup_enregistrement("csv")
-        with open(emplacement, "a") as ficher_csv:
-            ecrire = csv.writer(ficher_csv, delimiter=" ")
-            ecrire.writerow("")
-            ecrire.writerow("Heure,Taux_d'humidite,Temperature")
-            for i in range(len(liste_des_humiditees)):
-                ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}%,{liste_des_temperature[i]}C")
+        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement avec un même nom, cette nouvelle mesure y sera ajouté.", icon="info"):
+            popup_enregistrement("csv")
+            with open(emplacement, "a") as ficher_csv:
+                ecrire = csv.writer(ficher_csv, delimiter=" ")
+                ecrire.writerow("")
+                ecrire.writerow("Heure,Taux_d'humidite,Temperature")
+                for i in range(len(liste_des_humiditees)):
+                    ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}%,{liste_des_temperature[i]}C")
 
 ##################################demarrage mesure et analyse ##################
 def demarrage():
     # configuration()
+    enregistrement=0
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
     liste_des_humiditees = []
     liste_des_temperature = []
@@ -321,6 +399,8 @@ def demarrage():
         valeur_min_humidite.config(text = minimum)
         valeur_max_humidite.config(text = maximum)
         valeur_moyenne_humidite.config(text = moyenne)
+    sauvergarde_historique()
+
     print("liste de dates:", liste_des_dates_de_mesures)
     fenetre.mainloop()
 ######################################debut ####################################

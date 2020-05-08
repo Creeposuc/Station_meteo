@@ -4,10 +4,13 @@ import os
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter.filedialog import *
+import threading
 import time
 from random import randint
 import csv
 import datetime
+from subprocess import run
+
 port="COM4"
 liste_des_humiditees =[]
 liste_des_temperature =[]
@@ -16,6 +19,11 @@ enregistrement=int(0)
 temperature_actuelle=0
 humidite_actuelle=0
 fenetre =Tk()
+###########################threads##############################################
+def lancement_historique():
+    run("python historique.py")
+    # thread_historique=threading.Thread(target=historique)
+    # thread_historique.start()
 
 ###########################  Affichage   #######################################
 def Affichage_console(valeurs,moyenne, maximum, minimum):
@@ -29,7 +37,7 @@ def affichage_tkinter():
     Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)
     Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
-    Menu_fichier.add_command(label = "Historique", command=historique)
+    Menu_fichier.add_command(label = "Historique", command=lancement_historique)
     Menu_fichier.add_command(label = "préference", command=preference)
     Menu_fichier.add_separator()
     Menu_fichier.add_command(label = "Quitter", command=quitter)
@@ -181,47 +189,12 @@ def preference():
     preference.mainloop()
 def appliquer_preference():
     pass
-def historique():
-    global date_recherche_selectionne, boutton_recherche
-
-    historique=Tk()
-    titre_historique = Label(historique, text="Historique", font=("bold",16)).grid(row=0, column=0)
-
-    cadre_recherche = Frame(historique, borderwidth=5, relief=GROOVE)
-    cadre_recherche.grid(row=1, column=0)
-    titre_recherche = Label(cadre_recherche, text="Rechercher dans l'historique par date:").grid(row=0, column=0, columnspan=2)
-
-
-    date_recherche_selectionne=StringVar()
-    zone_de_recherche =  Entry(cadre_recherche, textvariable=date_recherche_selectionne ,width=19)
-    zone_de_recherche.grid(row=1, column=0)
-    date_recherche_selectionne.set("date")
-
-    boutton_recherche = Button(cadre_recherche, text="Rechercher", command=recherche_historique, bg="red").grid(row=1, column=1)
-
-    cadre_historique = Frame(historique, borderwidth=5, relief=GROOVE)
-    cadre_historique.grid(row=2, column=0)
-    affichage_resultat = Text(cadre_historique, width=50, height=30).grid(row=0, column=0)
-
-    historique.mainloop()
 def sauvergarde_historique():
     with open("Historiques_des_valeurs_mesurées", "a") as fichier_texte:
         date =datetime.datetime.now()
         fichier_texte.write(f"{date.day} {date.month} {date.year} {date.hour} {date.minute} {date.second}\n")
         for i in range(len(liste_des_humiditees)):
             fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
-
-def recherche_historique():
-    date_recherche=date_recherche_selectionne.get()
-    print("recherche de >", date_recherche)
-
-    with open("Historiques_des_valeurs_mesurées", "r") as fichier_texte:
-        for ligne in fichier_texte:
-            if date_recherche==ligne:
-                print("date trouvé")
-        fichier_texte.close()
-    print("fin de la recherche")
-
 
 def popup_enregistrement(extension):
     global emplacement

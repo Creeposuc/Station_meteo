@@ -1,4 +1,3 @@
-
 #include "DHT.h"
 #define DHTPIN 8
 #define DHTTYPE DHT22
@@ -11,8 +10,6 @@ void setup() {
 }
 
 void loop() {
-  lum = analogRead(A0);
-  temp = analogRead(A1);// read the input pin
   float h = dht.readHumidity();
   float t = dht.readTemperature();
   
@@ -23,11 +20,7 @@ void loop() {
   }
   
   Serial.println(">>>");
-  //Serial.println("luminosité");
   Serial.println(h); 
-  //Serial.println("température");
   Serial.println(t);
-  //temp = (temp*0.0481);
-  //delay(2400000);
-  delay(2000);
+  delay(900);
 }

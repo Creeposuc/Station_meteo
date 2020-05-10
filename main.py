@@ -1,4 +1,4 @@
-#import serial
+import serial
 import matplotlib.pyplot as plt
 import os
 from tkinter import *
@@ -10,6 +10,7 @@ from random import randint
 import csv
 import datetime
 from subprocess import run
+import pyperclip
 
 port="COM4"
 liste_des_humiditees =[]
@@ -36,6 +37,7 @@ def affichage_tkinter():
     Menu_fichier = Menu(bar_de_menu, tearoff=0)
     Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)
     Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)
+    Menu_fichier.add_command(label = "Copier les mesures dans le press papier pour regressi", command=enregistrement_reg)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_command(label = "Historique", command=lancement_historique)
     Menu_fichier.add_command(label = "préference", command=preference)
@@ -264,12 +266,14 @@ def reception():
             a+=1
         elif a==1:
             liste_des_humiditees.append(float(valeur[2:][:5]))
+            print(valeur)
             a+=1
         elif a==2:
             liste_des_temperature.append(float(valeur[2:][:5]))
             a=0
-        print(valeur)
-        time.sleep(int(case_intervalle.get())) #####################################################################################################################################################
+            print(valeur)
+            time.sleep(int(case_intervalle.get())-0.1)
+         #####################################################################################################################################################
     print("liste de dates:", liste_des_dates_de_mesures)
 
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
@@ -347,6 +351,20 @@ def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionn�
                 for i in range(len(liste_des_humiditees)):
                     ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}%,{liste_des_temperature[i]}C")
 
+def enregistrement_reg():
+    global enregistrement
+    enregistrement=1
+    if len(liste_des_humiditees)==0:
+        showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
+    else:
+        date = datetime.datetime.now()
+        pressepapier="mesure(numero) temperature(c) humidite(taux)\n"
+        for i in range(len(liste_des_humiditees)):
+            pressepapier=pressepapier + f"{i}  {liste_des_temperature[i]}  {liste_des_humiditees[i]}\n"
+        print(pressepapier)
+        pyperclip.copy(pressepapier)
+        spam = pyperclip.paste()
+
 ##################################demarrage mesure et analyse ##################
 def demarrage():
     # configuration()
@@ -356,7 +374,7 @@ def demarrage():
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
     recuperation_valeurs()
-    simulation_reception()
+    reception()
 
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]

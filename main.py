@@ -194,9 +194,9 @@ def appliquer_preference():
 def sauvergarde_historique():
     with open("Historiques_des_valeurs_mesurées", "a") as fichier_texte:
         date =datetime.datetime.now()
-        fichier_texte.write(f"{date.day} {date.month} {date.year} {date.hour} {date.minute} {date.second}\n")
+        fichier_texte.write(f"{date.day}/{date.month}/{date.year} {date.hour}h{date.minute}m{date.second}s\n")
         for i in range(len(liste_des_humiditees)):
-            fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
+            fichier_texte.write(f"{liste_des_dates_de_mesures[i]}>>> humidite:{liste_des_humiditees[i]}% Temperature:{liste_des_temperature[i]}C\n")
 
 def popup_enregistrement(extension):
     global emplacement
@@ -228,7 +228,7 @@ def graphique(liste1, liste2, liste_des_dates_de_mesures):
     plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité", marker="+")
     plt.plot(liste_numeros_des_mesures, liste2, label="Température", marker="+")
     plt.ylabel("valeur")
-    plt.xlabel("Heure")
+    plt.xlabel("numéro de la mesure")
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -272,7 +272,7 @@ def reception():
             liste_des_temperature.append(float(valeur[2:][:5]))
             a=0
             print(valeur)
-            time.sleep(int(case_intervalle.get())-0.1)
+            time.sleep(int(case_intervalle.get()))
          #####################################################################################################################################################
     print("liste de dates:", liste_des_dates_de_mesures)
 
@@ -374,7 +374,7 @@ def demarrage():
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
     recuperation_valeurs()
-    reception()
+    simulation_reception()
 
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]
@@ -396,5 +396,3 @@ def demarrage():
     fenetre.mainloop()
 ######################################debut ####################################
 affichage_tkinter()
-
-os.system("pause")

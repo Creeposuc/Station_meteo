@@ -1,31 +1,51 @@
-import serial
-import matplotlib.pyplot as plt
-import os
-from tkinter import *
-from tkinter.messagebox import *
-from tkinter.filedialog import *
-import threading
-import time
-from random import randint
-import csv
-import datetime
-from subprocess import run
-import pyperclip
+#importe les différents modules utile au fonctionnement du programme
+import webbrowser
+try:# on essaie d'importer les modules suivant
+    import serial#gère la connexion avec le capteur
+    import matplotlib.pyplot as plt#grée l'affichage du graphique
+    from tkinter import *#gère l'interface graphique
+    from tkinter.messagebox import *#gère les fenêtre popup
+    from tkinter.filedialog import *#gère les boîte de dialog pour selectionner un emplacement avec explorateur
+    import os
+    # import threading
+    # thread_historique=threading.Thread(target=historique)
+    # thread_historique.start()
+    import time#module qui gère les pauses dans le programme
+    from random import randint# utile pour la simulation de réception
+    import csv# gère l'export en fichier csv
+    import datetime#permet de récuperérer l'heure actuelle
+    from subprocess import run#permet de lancer des sous processus
+    import pyperclip#permet de copier un élément dans le press papier
+    import kdqfhludh
 
-port="COM4"
-liste_des_humiditees =[]
-liste_des_temperature =[]
-liste_des_dates_de_mesures = []
+except ModuleNotFoundError: # si il y a une erreur de module non trouvé
+    webbrowser.open(os.getcwd()+"/web/index.html")# on ouvre une page web d'aide
+    exit()#on ferme le programme python
+
+
+port="COM4" #définit le port de connexion du capteur au port 4
+liste_des_humiditees =[] # variable qui stock les humiditées mesurées
+liste_des_temperature =[]# variable qui stock les températures mesurées
+liste_des_dates_de_mesures = []# variable qui stock les dates de chaque mesures
 enregistrement=int(0)
 temperature_actuelle=0
 humidite_actuelle=0
-fenetre =Tk()
+fenetre =Tk()#création de la fenetre principale avec Tkinter
+def recuperation_preferences():
+    global couleur_boutton
+    #global couleur_boutton couleur_courbe_humidite couleur_courbe_humidite
+    with open("savegarde_des_preferences.txt","r") as save_pref:
+        interieur_save_pref = save_pref.read()
+        couleur_boutton = interieur_save_pref[0:7]
+        # couleur_boutton = interieur_save_pref[8:15]
+        # couleur_boutton = interieur_save_pref[16:23]
+    print(couleur_boutton)
+recuperation_preferences()
 ###########################threads##############################################
 def lancement_historique():
-    run("python historique.py")
-    # thread_historique=threading.Thread(target=historique)
-    # thread_historique.start()
-
+    run("python historique.py")#lance la commande suivante dans un CMD afin de lancer le programmequi s'occupe de l'affichage et de la recherche dans l'historique
+def lancement_preference():
+    run("python preference.py")
 ###########################  Affichage   #######################################
 def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
@@ -40,7 +60,7 @@ def affichage_tkinter():
     Menu_fichier.add_command(label = "Copier les mesures dans le press papier pour regressi", command=enregistrement_reg)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_command(label = "Historique", command=lancement_historique)
-    Menu_fichier.add_command(label = "préference", command=preference)
+    Menu_fichier.add_command(label = "Préférence", command=lancement_preference)
     Menu_fichier.add_separator()
     Menu_fichier.add_command(label = "Quitter", command=quitter)
     bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier)
@@ -91,7 +111,7 @@ def affichage_tkinter():
     case_intervalle.grid(row=3 ,column=1)
 
 
-    boutton_demarage = Button(cadre_zone_controle, text = "Demarrer la mesure",command=demarrage, bg="red")
+    boutton_demarage = Button(cadre_zone_controle, text = "Demarrer la mesure",command=demarrage, bg=couleur_boutton)
     boutton_demarage.grid(row=3 ,column=2)
 
     ##########################zone d'affichage valeur simple####################
@@ -166,44 +186,23 @@ def quitter():
     elif enregistrement==1:#les mesures ont été enregistrées
         exit()
 
-def preference():
-    preference=Tk()
-    titre_preference = Label(preference, text="Préférence de l'affichage",font=("bold",16)).grid(row=0, column=0)
 
-    cadre_preference = Frame(preference, borderwidth=5, relief=GROOVE)
-    cadre_preference.grid(row=1, column=0)
-
-    titre_couleur_boutton = Label(cadre_preference, text="Couleur des bouttons :").grid(row=0, column=0)
-    couleur=StringVar()
-    couleur.set("red")
-    boutton_rouge = Radiobutton(cadre_preference, text="Rouge",variable=couleur, value="red")
-    boutton_rouge.grid(row=1, column=0)
-    boutton_vert = Radiobutton(cadre_preference, text="Vert",variable=couleur, value="vert")
-    boutton_vert.grid(row=2, column=0)
-    boutton_bleu = Radiobutton(cadre_preference, text="bleu",variable=couleur, value="bleu")
-    boutton_bleu.grid(row=3, column=0)
-    boutton_jaune = Radiobutton(cadre_preference, text="Jaune",variable=couleur, value="jaune")
-    boutton_jaune.grid(row=4, column=0)
-
-
-    boutton_appliquer = Button(preference, text="Appliquer", command=appliquer_preference, bg="red").grid(row=2, column=0)
-
-    preference.mainloop()
-def appliquer_preference():
-    pass
 def sauvergarde_historique():
     with open("Historiques_des_valeurs_mesurées", "a") as fichier_texte:
         date =datetime.datetime.now()
-        fichier_texte.write(f"{date.day}/{date.month}/{date.year} {date.hour}h{date.minute}m{date.second}s\n")
+        fichier_texte.write(f"{date.day}/{date.month}/{date.year} {date.hour}:{date.minute}:{date.second}\n")
         for i in range(len(liste_des_humiditees)):
             fichier_texte.write(f"{liste_des_dates_de_mesures[i]}>>> humidite:{liste_des_humiditees[i]}% Temperature:{liste_des_temperature[i]}C\n")
+        if len(liste_des_dates_de_mesures)>1:
+            fichier_texte.write(f"Humidité>>> moyenne:{moy_humidite}% minimum:{min_humidite}% maximum:{max_humidite}%\n")
+            fichier_texte.write(f"Température>>> moyenne:{moy_temperature}C minimum:{min_temperature}C maximum:{max_temperature}C\n")
 
 def popup_enregistrement(extension):
     global emplacement
     emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures")
 
 def remise_a_zero():
-    if askyesno("Attention", "Êtes vous sure de vouloir faire ça?", icon="warning"):
+    if askyesno("Attention", "Êtes vous sûre de vouloir faire ça?", icon="warning"):
         liste_variable=[valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite]
         for i in liste_variable:
             i.config(text = "-")
@@ -324,32 +323,38 @@ def enregistrement_texte():
     global enregistrement
     enregistrement=1
     if len(liste_des_humiditees)==0:
-        showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
+        showinfo("Aucunes valeurs", "Vous ne pouvez- pas enregistrer car vous n'avez pas effectué de mesures")
     else:
         popup_enregistrement("txt")
-        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement avec un même nom, cette nouvelle mesure y sera ajouté.", icon="info"):
-            with open(emplacement, "a") as fichier_texte:
-                date = datetime.datetime.now()
-                fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
-                for i in range(len(liste_des_humiditees)):
-                    fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
-
-
-
+        if os.path.isfile(emplacement):
+            print("Fichier trouvé")
+            os.remove(emplacement)
+        with open(emplacement, "x") as fichier_texte:
+          date = datetime.datetime.now()
+          fichier_texte.write(f"date: {date.day}/{date.month}/{date.year}\n")
+          for i in range(len(liste_des_humiditees)):
+              fichier_texte.write(f"{liste_des_dates_de_mesures[i]} >>> humidité: {liste_des_humiditees[i]}%   Température: {liste_des_temperature[i]}C\n")
+          if len(liste_des_dates_de_mesures)>1:
+              fichier_texte.write(f"Humidité>>> moyenne:{moy_humidite}% minimum:{min_humidite}% maximum:{max_humidite}%\n")
+              fichier_texte.write(f"Température>>> moyenne:{moy_temperature}C minimum:{min_temperature}C maximum:{max_temperature}C\n")
 def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
     global enregistrement
     enregistrement=1
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
     else:
-        if askyesno("Enregistrement", "Vous êtes sûr le point d'enregistrer votre dernière mesure, si vous avez déjà enregister vos valeur dans un même emplacement avec un même nom, cette nouvelle mesure y sera ajouté.", icon="info"):
-            popup_enregistrement("csv")
-            with open(emplacement, "a") as ficher_csv:
-                ecrire = csv.writer(ficher_csv, delimiter=" ")
-                ecrire.writerow("")
-                ecrire.writerow("Heure,Taux_d'humidite,Temperature")
-                for i in range(len(liste_des_humiditees)):
-                    ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}%,{liste_des_temperature[i]}C")
+        popup_enregistrement("csv")
+        if os.path.isfile(emplacement):
+            print("Fichier trouvé")
+            os.remove(emplacement)
+        with open(emplacement, "a", newline="") as ficher_csv:
+            ecrire = csv.writer(ficher_csv, delimiter=" ")
+            ecrire.writerow("Heure,Taux_d'humidite,Temperature")
+            for i in range(len(liste_des_humiditees)):
+                ecrire.writerow(f"{liste_des_dates_de_mesures[i]},{liste_des_humiditees[i]}%,{liste_des_temperature[i]}C")
+            if len(liste_des_dates_de_mesures)>1:
+                ecrire.writerow(f"Humidite>>>,moyenne:{moy_humidite}%,minimum:{min_humidite}%,maximum:{max_humidite}%")
+                ecrire.writerow(f"Température>>>,moyenne:{moy_temperature}C,minimum:{min_temperature}C,maximum:{max_temperature}C")
 
 def enregistrement_reg():
     global enregistrement
@@ -363,13 +368,14 @@ def enregistrement_reg():
             pressepapier=pressepapier + f"{i}  {liste_des_temperature[i]}  {liste_des_humiditees[i]}\n"
         print(pressepapier)
         pyperclip.copy(pressepapier)
-        spam = pyperclip.paste()
+
 
 ##################################demarrage mesure et analyse ##################
 def demarrage():
     # configuration()
     enregistrement=0
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
+    global min_humidite, max_humidite, moy_humidite, min_temperature, max_temperature, moy_temperature
     liste_des_humiditees = []
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
@@ -384,12 +390,18 @@ def demarrage():
     if nombre_de_mesures!=1:
         analyse_donnees(liste_des_temperature)
         valeur_min_temperature.config(text = minimum)
+        min_temperature = minimum
         valeur_max_temperature.config(text = maximum)
+        max_temperature = maximum
         valeur_moyenne_temperature.config(text = moyenne)
+        moy_temperature = moyenne
         analyse_donnees(liste_des_humiditees)
         valeur_min_humidite.config(text = minimum)
+        min_humidite=minimum
         valeur_max_humidite.config(text = maximum)
+        max_humidite=maximum
         valeur_moyenne_humidite.config(text = moyenne)
+        moy_humidite=moyenne
     sauvergarde_historique()
 
     print("liste de dates:", liste_des_dates_de_mesures)

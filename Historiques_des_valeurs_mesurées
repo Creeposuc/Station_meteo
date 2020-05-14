@@ -1,16 +1,88 @@
-11/5/2020 11h1m52s
-11h1m51s >>> humidite: 42.0%   Temperature: 88.0C
-11/5/2020 11h1m53s
-11h1m52s >>> humidite: 61.0%   Temperature: 69.0C
-11/5/2020 11h1m54s
-11h1m53s >>> humidite: 35.0%   Temperature: 55.0C
-11/5/2020 11h1m55s
-11h1m54s >>> humidite: 100.0%   Temperature: 33.0C
-11/5/2020 11h1m56s
-11h1m55s >>> humidite: 44.0%   Temperature: 50.0C
-11/5/2020 11h1m57s
-11h1m56s >>> humidite: 89.0%   Temperature: 94.0C
-11/6/2020 11h2m4s
-11h2m1s >>> humidite: 3.0%   Temperature: 77.0C
-11h2m2s >>> humidite: 30.0%   Temperature: 41.0C
-11h2m3s >>> humidite: 72.0%   Temperature: 85.0C
+14/5/2020 11:39:7
+11h39m6s>>> humidite:0.0% Temperature:20.0C
+14/5/2020 11:39:8
+11h39m7s>>> humidite:92.0% Temperature:92.0C
+14/5/2020 11:39:9
+11h39m8s>>> humidite:23.0% Temperature:58.0C
+14/5/2020 11:39:10
+11h39m9s>>> humidite:74.0% Temperature:69.0C
+14/5/2020 13:31:23
+13h31m19s>>> humidite:8.0% Temperature:60.0C
+13h31m20s>>> humidite:79.0% Temperature:57.0C
+13h31m21s>>> humidite:90.0% Temperature:26.0C
+13h31m22s>>> humidite:31.0% Temperature:5.0C
+Température>>> moyenne:37.0 minimum:5.0 maximum:60.0
+Humidité>>> moyenne:52.0 minimum:8.0 maximum:90.0
+14/5/2020 13:49:49
+13h49m45s>>> humidite:47.0% Temperature:44.0C
+13h49m46s>>> humidite:82.0% Temperature:74.0C
+13h49m47s>>> humidite:73.0% Temperature:11.0C
+13h49m48s>>> humidite:99.0% Temperature:24.0C
+Humidité>>> moyenne:75.25% minimum:47.0% maximum:99.0%
+Température>>> moyenne:38.25C minimum:11.0C maximum:74.0C
+14/5/2020 13:52:54
+13h52m51s>>> humidite:10.0% Temperature:39.0C
+13h52m52s>>> humidite:76.0% Temperature:83.0C
+13h52m53s>>> humidite:99.0% Temperature:44.0C
+Humidité>>> moyenne:61.67% minimum:10.0% maximum:99.0%
+Température>>> moyenne:55.33C minimum:39.0C maximum:83.0C
+14/5/2020 13:55:2
+13h54m58s>>> humidite:93.0% Temperature:87.0C
+13h54m59s>>> humidite:60.0% Temperature:4.0C
+13h55m0s>>> humidite:83.0% Temperature:17.0C
+13h55m1s>>> humidite:37.0% Temperature:75.0C
+Humidité>>> moyenne:68.25% minimum:37.0% maximum:93.0%
+Température>>> moyenne:45.75C minimum:4.0C maximum:87.0C
+14/5/2020 13:57:58
+13h57m50s>>> humidite:21.0% Temperature:87.0C
+13h57m51s>>> humidite:0.0% Temperature:0.0C
+13h57m52s>>> humidite:66.0% Temperature:100.0C
+13h57m53s>>> humidite:66.0% Temperature:39.0C
+13h57m54s>>> humidite:82.0% Temperature:99.0C
+13h57m55s>>> humidite:62.0% Temperature:44.0C
+13h57m56s>>> humidite:68.0% Temperature:50.0C
+13h57m57s>>> humidite:92.0% Temperature:21.0C
+Humidité>>> moyenne:57.12% minimum:0.0% maximum:92.0%
+Température>>> moyenne:55.0C minimum:0.0C maximum:100.0C
+14/5/2020 14:2:40
+14h2m38s>>> humidite:5.0% Temperature:23.0C
+14h2m39s>>> humidite:84.0% Temperature:77.0C
+Humidité>>> moyenne:44.5% minimum:5.0% maximum:84.0%
+Température>>> moyenne:50.0C minimum:23.0C maximum:77.0C
+14/5/2020 14:57:15
+14h57m14s>>> humidite:31.0% Temperature:44.0C
+14/5/2020 14:57:16
+14h57m15s>>> humidite:63.0% Temperature:39.0C
+14/5/2020 14:57:26
+14h57m25s>>> humidite:92.0% Temperature:88.0C
+14/5/2020 15:2:39
+15h2m36s>>> humidite:66.0% Temperature:24.0C
+15h2m37s>>> humidite:23.0% Temperature:49.0C
+15h2m38s>>> humidite:82.0% Temperature:55.0C
+Humidité>>> moyenne:57.0% minimum:23.0% maximum:82.0%
+Température>>> moyenne:42.67C minimum:24.0C maximum:55.0C
+14/5/2020 15:2:44
+15h2m43s>>> humidite:81.0% Temperature:50.0C
+14/5/2020 15:18:26
+15h18m25s>>> humidite:53.0% Temperature:53.0C
+14/5/2020 15:18:45
+15h18m44s>>> humidite:62.0% Temperature:7.0C
+14/5/2020 15:19:2
+15h19m1s>>> humidite:57.0% Temperature:94.0C
+14/5/2020 15:34:31
+15h34m29s>>> humidite:57.0% Temperature:73.0C
+15h34m30s>>> humidite:14.0% Temperature:85.0C
+Humidité>>> moyenne:35.5% minimum:14.0% maximum:57.0%
+Température>>> moyenne:79.0C minimum:73.0C maximum:85.0C
+14/5/2020 15:35:16
+15h35m14s>>> humidite:47.0% Temperature:1.0C
+15h35m15s>>> humidite:94.0% Temperature:99.0C
+Humidité>>> moyenne:70.5% minimum:47.0% maximum:94.0%
+Température>>> moyenne:50.0C minimum:1.0C maximum:99.0C
+14/5/2020 15:36:45
+15h36m41s>>> humidite:13.0% Temperature:74.0C
+15h36m42s>>> humidite:45.0% Temperature:22.0C
+15h36m43s>>> humidite:12.0% Temperature:90.0C
+15h36m44s>>> humidite:30.0% Temperature:73.0C
+Humidité>>> moyenne:25.0% minimum:12.0% maximum:45.0%
+Température>>> moyenne:64.75C minimum:22.0C maximum:90.0C

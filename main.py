@@ -16,7 +16,6 @@ try:# on essaie d'importer les modules suivant
     import datetime#permet de récuperérer l'heure actuelle
     from subprocess import run#permet de lancer des sous processus
     import pyperclip#permet de copier un élément dans le press papier
-    import kdqfhludh
 
 except ModuleNotFoundError: # si il y a une erreur de module non trouvé
     webbrowser.open(os.getcwd()+"/web/index.html")# on ouvre une page web d'aide
@@ -32,14 +31,24 @@ temperature_actuelle=0
 humidite_actuelle=0
 fenetre =Tk()#création de la fenetre principale avec Tkinter
 def recuperation_preferences():
-    global couleur_boutton
+    global couleur_boutton, couleur_courbe_humidite, couleur_courbe_temperature, aspect_courbe_temperature, aspect_courbe_humidite
     #global couleur_boutton couleur_courbe_humidite couleur_courbe_humidite
-    with open("savegarde_des_preferences.txt","r") as save_pref:
+    with open("savegarde_des_preference.txt","r") as save_pref:
         interieur_save_pref = save_pref.read()
         couleur_boutton = interieur_save_pref[0:7]
-        # couleur_boutton = interieur_save_pref[8:15]
-        # couleur_boutton = interieur_save_pref[16:23]
-    print(couleur_boutton)
+        couleur_courbe_temperature = interieur_save_pref[8:15]
+        couleur_courbe_humidite = interieur_save_pref[16:23]
+
+        aspect_courbe_temperature = interieur_save_pref[24:26]
+        if aspect_courbe_temperature=="tp":
+            aspect_courbe_temperature="solid"
+        else:
+            aspect_courbe_temperature="dashed"
+        aspect_courbe_humidite = interieur_save_pref[27:29]
+        if aspect_courbe_humidite=="tp":
+            aspect_courbe_humidite="solid"
+        else:
+            aspect_courbe_humidite="dashed"
 recuperation_preferences()
 ###########################threads##############################################
 def lancement_historique():
@@ -51,7 +60,6 @@ def Affichage_console(valeurs,moyenne, maximum, minimum):
     print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
 def affichage_tkinter():
     global case_dure_mesures, case_intervalle, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite, value
-    #############################menu déroulant  ###############################
     bar_de_menu = Menu(fenetre)
 
     Menu_fichier = Menu(bar_de_menu, tearoff=0)
@@ -224,8 +232,8 @@ def graphique(liste1, liste2, liste_des_dates_de_mesures):
     for i in range(nombre_de_mesures):
         liste_numeros_des_mesures.append(i+1)
     plt.title(f"Température et Taux d'humididté à partir de {liste_des_dates_de_mesures[0]}")
-    plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité", marker="+")
-    plt.plot(liste_numeros_des_mesures, liste2, label="Température", marker="+")
+    plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité",linestyle=f"{aspect_courbe_humidite}", marker="+", color=f"{couleur_courbe_humidite}")
+    plt.plot(liste_numeros_des_mesures, liste2, label="Température",linestyle=f"{aspect_courbe_temperature}", marker="+", color=f"{couleur_courbe_temperature}")
     plt.ylabel("valeur")
     plt.xlabel("numéro de la mesure")
     plt.legend()
@@ -260,20 +268,16 @@ def reception():
         if ">>>" in valeur:
             date = datetime.datetime.now()
             liste_des_dates_de_mesures.append(str(f"{date.hour}h{date.minute}m{date.second}s"))
-            print(str(f"{date.hour}h{date.minute}m{date.second}s"))
             a=0
             a+=1
         elif a==1:
             liste_des_humiditees.append(float(valeur[2:][:5]))
-            print(valeur)
             a+=1
         elif a==2:
             liste_des_temperature.append(float(valeur[2:][:5]))
             a=0
-            print(valeur)
             time.sleep(int(case_intervalle.get()))
          #####################################################################################################################################################
-    print("liste de dates:", liste_des_dates_de_mesures)
 
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
@@ -281,16 +285,12 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
     for i in range(nombre_de_mesures*3):
         if a==0:
             valeur = ">>>"
-            print(">>>")
         else:
             valeur = randint(0,100)
             valeur = str(valeur)
-            print(valeur)
         if ">>>" in valeur:
             date = datetime.datetime.now()
             liste_des_dates_de_mesures.append(str(f"{date.hour}h{date.minute}m{date.second}s"))
-            print(str(f"{date.hour}h{date.minute}m{date.second}s"))
-
             a=0
             a+=1
         elif a==1:
@@ -300,7 +300,6 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
             liste_des_temperature.append(float(valeur))
             a=0
             time.sleep(int(case_intervalle.get()))
-    print("liste de dates:", liste_des_dates_de_mesures)
 
 ################################# analyse #######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
@@ -327,7 +326,6 @@ def enregistrement_texte():
     else:
         popup_enregistrement("txt")
         if os.path.isfile(emplacement):
-            print("Fichier trouvé")
             os.remove(emplacement)
         with open(emplacement, "x") as fichier_texte:
           date = datetime.datetime.now()
@@ -345,7 +343,6 @@ def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionn�
     else:
         popup_enregistrement("csv")
         if os.path.isfile(emplacement):
-            print("Fichier trouvé")
             os.remove(emplacement)
         with open(emplacement, "a", newline="") as ficher_csv:
             ecrire = csv.writer(ficher_csv, delimiter=" ")
@@ -366,9 +363,7 @@ def enregistrement_reg():
         pressepapier="mesure(numero) temperature(c) humidite(taux)\n"
         for i in range(len(liste_des_humiditees)):
             pressepapier=pressepapier + f"{i}  {liste_des_temperature[i]}  {liste_des_humiditees[i]}\n"
-        print(pressepapier)
         pyperclip.copy(pressepapier)
-
 
 ##################################demarrage mesure et analyse ##################
 def demarrage():
@@ -404,7 +399,6 @@ def demarrage():
         moy_humidite=moyenne
     sauvergarde_historique()
 
-    print("liste de dates:", liste_des_dates_de_mesures)
     fenetre.mainloop()
 ######################################debut ####################################
 affichage_tkinter()

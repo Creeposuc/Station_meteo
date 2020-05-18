@@ -22,104 +22,103 @@ except ModuleNotFoundError: # si il y a une erreur de module non trouvé
     exit()#on ferme le programme python
 
 
-port="COM4" #définit le port de connexion du capteur au port 4
+port="COM4" #définit le port de connexion  originale du capteur au port 4
 liste_des_humiditees =[] # variable qui stock les humiditées mesurées
 liste_des_temperature =[]# variable qui stock les températures mesurées
 liste_des_dates_de_mesures = []# variable qui stock les dates de chaque mesures
-enregistrement=int(0)
-temperature_actuelle=0
-humidite_actuelle=0
+enregistrement=int(0)# création de la valriable qui permet de bloqué la fermeture du programme si les valeurs ne sont pas enregistrées
+temperature_actuelle=0# création de la variable qui enregistre la dernière valeur de température mesurée
+humidite_actuelle=0 #création de la variable qui enregistre la dernière valeur de taux d'humidité mesurée
 fenetre =Tk()#création de la fenetre principale avec Tkinter
-def recuperation_preferences():
-    global couleur_boutton, couleur_courbe_humidite, couleur_courbe_temperature, aspect_courbe_temperature, aspect_courbe_humidite
-    #global couleur_boutton couleur_courbe_humidite couleur_courbe_humidite
-    with open("savegarde_des_preference.txt","r") as save_pref:
-        interieur_save_pref = save_pref.read()
-        couleur_boutton = interieur_save_pref[0:7]
+def recuperation_preferences():# fonction qui récupère les valeurs des préférences de l'utilisateur pour les appliquer dans le programme
+    global couleur_boutton, couleur_courbe_humidite, couleur_courbe_temperature, aspect_courbe_temperature, aspect_courbe_humidite# définition des variable suivante en variable globales
+    with open("savegarde_des_preference.txt","r") as save_pref:# ouvre le fichier qui contient les valeurs des préférences en lecture seule en tant que la variable save_pref
+        interieur_save_pref = save_pref.read()# enregistre le contenue du fichier lu dans une variable
+        couleur_boutton = interieur_save_pref[0:7]# enregistre la préférence sélectioné choisi par l'utilisateur dans une variable
         couleur_courbe_temperature = interieur_save_pref[8:15]
         couleur_courbe_humidite = interieur_save_pref[16:23]
-
         aspect_courbe_temperature = interieur_save_pref[24:26]
-        if aspect_courbe_temperature=="tp":
-            aspect_courbe_temperature="solid"
+        #les condition suivantes permettent de "normaliser" les valeurs des préférences pour l'affichage du graphique
+        if aspect_courbe_temperature=="tp": #si il est inscrit "tp" (trait plein) alors
+            aspect_courbe_temperature="solid"# aspect_courbe_temperature prend la valeur "solid" (une valeur compréhensible pour le module matplotlib qui gère le graphique)
         else:
-            aspect_courbe_temperature="dashed"
+            aspect_courbe_temperature="dashed"#sinon aspect_courbe_temperature prend la valeur "dashed" (une valeur compréhensible pour le module matplotlib qui gère le graphique)
         aspect_courbe_humidite = interieur_save_pref[27:29]
+        # la condition suivante a le même fonctionnement
         if aspect_courbe_humidite=="tp":
             aspect_courbe_humidite="solid"
         else:
             aspect_courbe_humidite="dashed"
-recuperation_preferences()
-###########################threads##############################################
-def lancement_historique():
-    run("python historique.py")#lance la commande suivante dans un CMD afin de lancer le programmequi s'occupe de l'affichage et de la recherche dans l'historique
-def lancement_preference():
-    run("python preference.py")
-###########################  Affichage   #######################################
-def Affichage_console(valeurs,moyenne, maximum, minimum):
-    print("valeurs:", valeurs,"\nmoyenne:", moyenne,"\nmaximum:", maximum,"\nminimum:", minimum)
-def affichage_tkinter():
-    global case_dure_mesures, case_intervalle, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite, value
-    bar_de_menu = Menu(fenetre)
 
-    Menu_fichier = Menu(bar_de_menu, tearoff=0)
-    Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)
-    Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)
+recuperation_preferences()# on exécute la commande au début du programme
+###########################threads##############################################
+def lancement_historique():# permet de lancer la fenêtre de l'historique
+    run("python historique.py")# lance la commande suivante dans un CMD afin de lancer le programme qui s'occupe de l'affichage et de la recherche dans l'historique
+def lancement_preference():# permet de lancer la fenêtre des préférences
+    run("python preference.py")# Même fonctionnement
+###########################  Affichage   #######################################
+def affichage_tkinter():# fonction qui permet l'affichage de la fenêtre et des menus
+    # la plupart des widget présent dans cette fonction ainsi que les placement de ces éléments on une construction ressanblante, au moins un des widget de chaque type est commenté
+    global case_dure_mesures, case_intervalle, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite, value# définition des variable suivante en variable globales
+    bar_de_menu = Menu(fenetre)# création d'une barre de menu dans la fenêtre
+
+    Menu_fichier = Menu(bar_de_menu, tearoff=0) # on créer une variable qui gère la barre de menu
+    Menu_fichier.add_command(label = "Enregistrer en csv", command=enregistrement_CSV)# création d'un boutton dans le menu déroulant qui a un nom (Label) et une commande (une fonction)
+    Menu_fichier.add_command(label = "Enregistrer en texte", command=enregistrement_texte)# même fonctionnement que précédement...
     Menu_fichier.add_command(label = "Copier les mesures dans le press papier pour regressi", command=enregistrement_reg)
     Menu_fichier.add_command(label = "Remise à zéro", command=remise_a_zero)
     Menu_fichier.add_command(label = "Historique", command=lancement_historique)
     Menu_fichier.add_command(label = "Préférence", command=lancement_preference)
-    Menu_fichier.add_separator()
+    Menu_fichier.add_separator() #on ajoute un séparateur visuel dans le menue déroulan fichier
     Menu_fichier.add_command(label = "Quitter", command=quitter)
-    bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier)
+    bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier) #on donne le nom de "Fichier" au menu déroulant définit par Menu_fichier
 
-    Menu_aide = Menu(bar_de_menu, tearoff=0)
-    Menu_aide.add_command(label = "Voir l'aide")
+    Menu_aide = Menu(bar_de_menu, tearoff=0)# même fonctionnement que pour le menu déroulant "Fichier"
+    Menu_aide.add_command(label = "Voir l'aide")# même fonctionnement que pour le menu déroulant "Fichier"
     Menu_aide.add_separator()
     Menu_aide.add_command(label = "Qui sommes nous ?")
-    bar_de_menu.add_cascade(label="Aide", menu=Menu_aide)
+    bar_de_menu.add_cascade(label="Aide", menu=Menu_aide)# même fonctionnement que pour le menu déroulant "Fichier"
 
-    fenetre.config(menu=bar_de_menu)
+    fenetre.config(menu=bar_de_menu)#on donne le menu précédent a la fenêtre de nom "fenetre"
 
-    #nom_ducadre=Frame(fenetre, borderwidth=4, relief=GROOVE).grid(....)
-    #titre1 =Label(Frame, text="Zone de contrôle").grid(row=0 ,column=0, columnspan=4)
     #############################zone de commande###############################
-    cadre_zone_controle = Frame(fenetre, borderwidth=5, relief=GROOVE)
+    cadre_zone_controle = Frame(fenetre, borderwidth=5, relief=GROOVE)# création d'un cadre qui est placé dans fenêtre et qui contiendra la zone de contrôle
     cadre_zone_controle.grid(row=1, column=0)
 
     titre1 =Label(cadre_zone_controle, text="Zone de contrôle").grid(row=0, column=0, columnspan=3)
 
-    ########################################radio ########################################################
-    value=IntVar()
-    value.set(1)
-    cadre_boutton_radio = Frame(cadre_zone_controle, borderwidth=3, relief=GROOVE)
+    ########################################radio ##############################
+    #boutton radio qui permettent de donner le choix à l'utilisateur de choisir l'ordre de grandeur de la durées des mesures
+    nombre_seconde=IntVar()
+    nombre_seconde.set(1)# on donne a la variable nombre_seconde la valeur "1"
+    cadre_boutton_radio = Frame(cadre_zone_controle, borderwidth=3, relief=GROOVE)#création d'un cadre qui contient les bouttons radio dans la zone de contrôle
     cadre_boutton_radio.grid(row=1, column=0, columnspan=3)
 
-    titre_boutton_radio = Label(cadre_boutton_radio, text="En quelle unitée est votre mesure ?")
-    titre_boutton_radio.grid(row=0, column=0, columnspan=3)
+    titre_boutton_radio = Label(cadre_boutton_radio, text="En quelle unitée est votre mesure ?")#titre au dessus des boutons radios, situé dans le cadre précédent et qui a pour texte "En quelle unitée est votre mesure ?"
+    titre_boutton_radio.grid(row=0, column=0, columnspan=3)# même méthode de placement que précédement
 
-    radio_seconde = Radiobutton(cadre_boutton_radio, text="En secondes", variable=value, value=1)
+    radio_seconde = Radiobutton(cadre_boutton_radio, text="En secondes", variable=nombre_seconde, value=1)# création d'un bouton radio, inscrit dans le cadre précédent, qui à pour texte/titre "En seconde", qui fait varier la variable "nombre_seconde" a 1
     radio_seconde.grid(row=1, column=0)
 
-    radio_minute = Radiobutton(cadre_boutton_radio, text="En minutes", variable=value, value=60)
+    radio_minute = Radiobutton(cadre_boutton_radio, text="En minutes", variable=nombre_seconde, value=60)
     radio_minute.grid(row=1, column=1)
 
-    radio_heure = Radiobutton(cadre_boutton_radio, text="En heures", variable=value, value=3600)
+    radio_heure = Radiobutton(cadre_boutton_radio, text="En heures", variable=nombre_seconde, value=3600)
     radio_heure.grid(row=1, column=2)
-    ########################################fin radio###############################################################
+    ########################################fin radio###########################
 
     titre_case_nombre_mesure = Label(cadre_zone_controle, text="Durée de la mesure :").grid(row=2, column=0)
 
     titre_case_nombre_mesure_temps = Label(cadre_zone_controle, text="Intervalle de temps entre deux mesures :").grid(row=2, column=1)
 
-    case_dure_mesures = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
+    case_dure_mesures = Spinbox(cadre_zone_controle, from_=1, to=43200 )#création d'un champ de saisie de valeur numérique qui va de 1 a 43200
     case_dure_mesures.grid(row=3 ,column=0)
 
-    case_intervalle = Spinbox(cadre_zone_controle, from_=1, to=43200 )# une journe de mesure maximum
+    case_intervalle = Spinbox(cadre_zone_controle, from_=1, to=43200 )
     case_intervalle.grid(row=3 ,column=1)
 
 
-    boutton_demarage = Button(cadre_zone_controle, text = "Demarrer la mesure",command=demarrage, bg=couleur_boutton)
+    boutton_demarage = Button(cadre_zone_controle, text = "Demarrer la mesure",command=demarrage, bg=couleur_boutton)# création d'un boutton qui a pour texte "Démarrer la mesure", qui a pour commande "démarrage", et qui a une couleur de fond défini par la variable couleur_boutton
     boutton_demarage.grid(row=3 ,column=2)
 
     ##########################zone d'affichage valeur simple####################
@@ -181,18 +180,17 @@ def affichage_tkinter():
     valeur_moyenne_humidite.grid(row=10, column=3)
 
     ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
-    bouton_graph = Button(fenetre, text = "Afficher le graphique",command=graphique_redirection, bg="blue")
+    bouton_graph = Button(fenetre, text = "Afficher le graphique",command=graphique_redirection, bg=couleur_boutton)# création d'un boutton qui a pour texte "Démarrer la mesure", qui a pour commande "graphique redirection"
     bouton_graph.grid(row=11 ,column=0, columnspan=4)
 
-    fenetre.mainloop()
+    fenetre.mainloop()#lancement et ouverture de la fenêtre
 
-def quitter():
-    print(enregistrement)
-    if enregistrement==0:
-        if askyesno("Attention", "Aucunes mersures ne sera sauvegardées", icon="warning"):
-            exit()
+def quitter():# fonction qui permet de fermer le programme lorsqu'on click sur "quitter" dans le menue déroulant "fichier"
+    if enregistrement==0:#si aucun enregistrement n'as été effectué
+        if askyesno("Attention", "Aucunes mersures ne sera sauvegardées", icon="warning"):#un message d'alerte s'affiche
+            exit()#si l'utilisateur appuie sur oui, alors le programe se ferme avec la fonction "exit"
     elif enregistrement==1:#les mesures ont été enregistrées
-        exit()
+        exit() #alors le programe se ferme avec la fonction "exit"
 
 
 def sauvergarde_historique():
@@ -206,7 +204,7 @@ def sauvergarde_historique():
             fichier_texte.write(f"Température>>> moyenne:{moy_temperature}C minimum:{min_temperature}C maximum:{max_temperature}C\n")
 
 def popup_enregistrement(extension):
-    global emplacement
+    global emplacement # définition des variable suivante en variable globales
     emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures")
 
 def remise_a_zero():
@@ -217,14 +215,11 @@ def remise_a_zero():
         showinfo("information", "mis à zéro!")
 
 def recuperation_valeurs():
-    global nombre_de_mesures
+    global nombre_de_mesures # définition des variable suivante en variable globales
     dure_mesure=int(case_dure_mesures.get())
-    print(dure_mesure)
     intervalle_temps=int(case_intervalle.get())
-    print(intervalle_temps)
-    valeur=int(value.get())
-    nombre_de_mesures = int(dure_mesure*int(valeur)/intervalle_temps)
-    print(nombre_de_mesures)
+    nombre_de_seconde=int(nombre_seconde.get())
+    nombre_de_mesures = int(dure_mesure*int(nombre_de_seconde)/intervalle_temps)
 
 def graphique(liste1, liste2, liste_des_dates_de_mesures):
     valeur_moyenne_temperature.cget("text")
@@ -248,7 +243,7 @@ def graphique_redirection():
 #########################initialisation########################################
 
 def configuration():#recherche la connexion serie
-    global port, inter_exter
+    global port, inter_exter# définition des variable suivante en variable globales
     Systeme_exploitation = str(input("quel est votre sytème d'exploitation (w/l)?\n>>>"))
     if Systeme_exploitation=="l":
         port="/dev/ttyACM0"
@@ -259,7 +254,7 @@ def configuration():#recherche la connexion serie
 ###########################communication #######################################
 
 def reception():
-    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures# définition des variable suivante en variable globales
     a=0
     communication_serie = serial.Serial(port, 9600)
     for i in range(nombre_de_mesures*3):
@@ -280,7 +275,7 @@ def reception():
          #####################################################################################################################################################
 
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
-    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures# définition des variable suivante en variable globales
     a=0
     for i in range(nombre_de_mesures*3):
         if a==0:
@@ -304,7 +299,7 @@ def simulation_reception(): #simule la reception des donnees des capteur pour po
 ################################# analyse #######################################
 # traites les informations reçus: en liste, une par une, moyenne, max, minimum
 def analyse_donnees(valeurs):
-    global maximum, minimum, moyenne
+    global maximum, minimum, moyenne # définition des variable suivante en variable globales
     sommes_des_valeurs=0
     for i in range(len(valeurs)):
         sommes_des_valeurs+=valeurs[i]
@@ -319,7 +314,7 @@ def analyse_donnees(valeurs):
 ############################### eregristrement #################################
 
 def enregistrement_texte():
-    global enregistrement
+    global enregistrement# définition des variable suivante en variable globales
     enregistrement=1
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez- pas enregistrer car vous n'avez pas effectué de mesures")
@@ -336,7 +331,7 @@ def enregistrement_texte():
               fichier_texte.write(f"Humidité>>> moyenne:{moy_humidite}% minimum:{min_humidite}% maximum:{max_humidite}%\n")
               fichier_texte.write(f"Température>>> moyenne:{moy_temperature}C minimum:{min_temperature}C maximum:{max_temperature}C\n")
 def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionné l'emplacement, info avec séparation utf8
-    global enregistrement
+    global enregistrement# définition des variable suivante en variable globales
     enregistrement=1
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
@@ -354,7 +349,7 @@ def enregistrement_CSV():#rajouter les espaces pour taux d'humidite, selectionn�
                 ecrire.writerow(f"Température>>>,moyenne:{moy_temperature}C,minimum:{min_temperature}C,maximum:{max_temperature}C")
 
 def enregistrement_reg():
-    global enregistrement
+    global enregistrement# définition des variable suivante en variable globales
     enregistrement=1
     if len(liste_des_humiditees)==0:
         showinfo("Aucunes valeurs", "Vous ne pouvez pas enregistrer car vous n'avez pas effectué de mesures")
@@ -369,8 +364,8 @@ def enregistrement_reg():
 def demarrage():
     # configuration()
     enregistrement=0
-    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures
-    global min_humidite, max_humidite, moy_humidite, min_temperature, max_temperature, moy_temperature
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures# définition des variable suivante en variable globales
+    global min_humidite, max_humidite, moy_humidite, min_temperature, max_temperature, moy_temperature# définition des variable suivante en variable globales
     liste_des_humiditees = []
     liste_des_temperature = []
     liste_des_dates_de_mesures = []

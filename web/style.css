@@ -1,6 +1,7 @@
 body{
   background-color: rgb(61, 61, 65);
   margin: 0;
+  font-family: Noto Sans;
 }
 .texte_centré{
   text-align: center;
@@ -57,4 +58,10 @@ nav a{
 }
 #présentation_par_idées .visualisation{
       border: 4px green solid;
+}
+
+/**********************************images**************************************/
+#image_regressis{
+  width: 40%;
+  margin-left: 5%;
 }

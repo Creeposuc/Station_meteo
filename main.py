@@ -6,10 +6,7 @@ try:# on essaie d'importer les modules suivant
     from tkinter import *#gère l'interface graphique
     from tkinter.messagebox import *#gère les fenêtre popup
     from tkinter.filedialog import *#gère les boîte de dialog pour selectionner un emplacement avec explorateur
-    import os
-    # import threading
-    # thread_historique=threading.Thread(target=historique)
-    # thread_historique.start()
+    import os #module qui nous permet dans notre cas de vérifier la présence d'un fichier
     import time#module qui gère les pauses dans le programme
     from random import randint# utile pour la simulation de réception
     import csv# gère l'export en fichier csv
@@ -18,7 +15,7 @@ try:# on essaie d'importer les modules suivant
     import pyperclip#permet de copier un élément dans le press papier
 
 except ModuleNotFoundError: # si il y a une erreur de module non trouvé
-    webbrowser.open(os.getcwd()+"/web/index.html")# on ouvre une page web d'aide
+    webbrowser.open(os.getcwd()+"/web/aide.html")# on ouvre une page web d'aide
     exit()#on ferme le programme python
 
 
@@ -29,6 +26,7 @@ liste_des_dates_de_mesures = []# variable qui stock les dates de chaque mesures
 enregistrement=int(0)# création de la valriable qui permet de bloqué la fermeture du programme si les valeurs ne sont pas enregistrées
 temperature_actuelle=0# création de la variable qui enregistre la dernière valeur de température mesurée
 humidite_actuelle=0 #création de la variable qui enregistre la dernière valeur de taux d'humidité mesurée
+simu = 0 #valeurs qui indique si la mesure est une simulation ou non
 fenetre =Tk()#création de la fenetre principale avec Tkinter
 def recuperation_preferences():# fonction qui récupère les valeurs des préférences de l'utilisateur pour les appliquer dans le programme
     global couleur_boutton, couleur_courbe_humidite, couleur_courbe_temperature, aspect_courbe_temperature, aspect_courbe_humidite# définition des variable suivante en variable globales
@@ -58,8 +56,8 @@ def lancement_preference():# permet de lancer la fenêtre des préférences
     run("python preference.py")# Même fonctionnement
 ###########################  Affichage   #######################################
 def affichage_tkinter():# fonction qui permet l'affichage de la fenêtre et des menus
-    # la plupart des widget présent dans cette fonction ainsi que les placement de ces éléments on une construction ressanblante, au moins un des widget de chaque type est commenté
-    global case_dure_mesures, case_intervalle, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite, value# définition des variable suivante en variable globales
+    # la plupart des widget présent dans cette fonction ainsi que les placement de ces éléments ont une construction ressanblante, au moins un des widget de chaque type est commenté
+    global case_dure_mesures, case_intervalle, valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite, nombre_seconde, mesure_termine# définition des variable suivante en variable globales
     bar_de_menu = Menu(fenetre)# création d'une barre de menu dans la fenêtre
 
     Menu_fichier = Menu(bar_de_menu, tearoff=0) # on créer une variable qui gère la barre de menu
@@ -70,13 +68,14 @@ def affichage_tkinter():# fonction qui permet l'affichage de la fenêtre et des 
     Menu_fichier.add_command(label = "Historique", command=lancement_historique)
     Menu_fichier.add_command(label = "Préférence", command=lancement_preference)
     Menu_fichier.add_separator() #on ajoute un séparateur visuel dans le menue déroulan fichier
+    Menu_fichier.add_command(label = "Simulation", command=redirection_simulation)
     Menu_fichier.add_command(label = "Quitter", command=quitter)
     bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier) #on donne le nom de "Fichier" au menu déroulant définit par Menu_fichier
 
     Menu_aide = Menu(bar_de_menu, tearoff=0)# même fonctionnement que pour le menu déroulant "Fichier"
-    Menu_aide.add_command(label = "Voir l'aide")# même fonctionnement que pour le menu déroulant "Fichier"
+    Menu_aide.add_command(label = "Voir l'aide", command=page_aide)# même fonctionnement que pour le menu déroulant "Fichier"
     Menu_aide.add_separator()
-    Menu_aide.add_command(label = "Qui sommes nous ?")
+    Menu_aide.add_command(label = "Notre site internet", command=page_site)
     bar_de_menu.add_cascade(label="Aide", menu=Menu_aide)# même fonctionnement que pour le menu déroulant "Fichier"
 
     fenetre.config(menu=bar_de_menu)#on donne le menu précédent a la fenêtre de nom "fenetre"
@@ -180,20 +179,27 @@ def affichage_tkinter():# fonction qui permet l'affichage de la fenêtre et des 
     valeur_moyenne_humidite.grid(row=10, column=3)
 
     ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
-    bouton_graph = Button(fenetre, text = "Afficher le graphique",command=graphique_redirection, bg=couleur_boutton)# création d'un boutton qui a pour texte "Démarrer la mesure", qui a pour commande "graphique redirection"
-    bouton_graph.grid(row=11 ,column=0, columnspan=4)
+    bouton_graph = Button(fenetre, text="Afficher le graphique",command=graphique_redirection, bg=couleur_boutton)# création d'un boutton qui a pour texte "Démarrer la mesure", qui a pour commande "graphique redirection"
+    bouton_graph.grid(row=4 ,column=0)
 
     fenetre.mainloop()#lancement et ouverture de la fenêtre
-
+def page_aide():
+    webbrowser.open(os.getcwd()+"/web/aide.html")# on ouvre une page web d'aide
+def page_site():
+    webbrowser.open(os.getcwd()+"/web/index.html")# on ouvre page la page du site web
 def quitter():# fonction qui permet de fermer le programme lorsqu'on click sur "quitter" dans le menue déroulant "fichier"
     if enregistrement==0:#si aucun enregistrement n'as été effectué
-        if askyesno("Attention", "Aucunes mersures ne sera sauvegardées", icon="warning"):#un message d'alerte s'affiche
+        if Menu_fichier.add_command(label = "Préférence", command=lancement_preference):#un message d'alerte s'affiche
             exit()#si l'utilisateur appuie sur oui, alors le programe se ferme avec la fonction "exit"
     elif enregistrement==1:#les mesures ont été enregistrées
         exit() #alors le programe se ferme avec la fonction "exit"
 
+def redirection_simulation():
+    global simu
+    simu=1
+    demarrage()
 
-def sauvergarde_historique():
+def sauvergarde_historique():#fonction qui permet d'enregistrer toutes les mesures effectuer par l'utilisateur dans l'historique
     with open("Historiques_des_valeurs_mesurées", "a") as fichier_texte:
         date =datetime.datetime.now()
         fichier_texte.write(f"{date.day}/{date.month}/{date.year} {date.hour}:{date.minute}:{date.second}\n")
@@ -207,27 +213,26 @@ def popup_enregistrement(extension):
     global emplacement # définition des variable suivante en variable globales
     emplacement =asksaveasfilename(title = "sauvegarder votre mesure", defaultextension=f".{extension}", initialfile="mesures")
 
-def remise_a_zero():
-    if askyesno("Attention", "Êtes vous sûre de vouloir faire ça?", icon="warning"):
-        liste_variable=[valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite]
-        for i in liste_variable:
-            i.config(text = "-")
-        showinfo("information", "mis à zéro!")
+def remise_a_zero():# on créer une fonction permettant de réinitialiser les valeurs mesurés
+    if askyesno("Attention", "Êtes vous sûre de vouloir faire ça?", icon="warning"): #ouvre une fenêtre d'alerte demandant a l'utilisateur si il est certain de vouloir réinitialiser ses valeurs
+        liste_variable=[valeur_temperature, valeur_humidite, valeur_min_temperature, valeur_max_temperature, valeur_moyenne_temperature, valeur_min_humidite, valeur_max_humidite, valeur_moyenne_humidite]# création d'une liste incluant toutes les valeurs à réinitialiser
+        for i in liste_variable: #on parcourt les élément de la liste
+            i.config(text = "-")# on enleve toutes les valeurs de la liste et on les remplace par "-" comme initialement
+        showinfo("information", "mis à zéro!")# ouvre une fenêtre d'alerte pour confirmer a l'utilisateur que les valeurs ont bien été mises a zéro
 
-def recuperation_valeurs():
+def recuperation_valeurs():#cette fonction nous permet de faire la liaison entre la "zone de contrôle" de l'interface graphique et les autres fonctions du programme. Elle permet nottamment de récupérer les valeur des boutons radio et champs de saisie
     global nombre_de_mesures # définition des variable suivante en variable globales
-    dure_mesure=int(case_dure_mesures.get())
-    intervalle_temps=int(case_intervalle.get())
-    nombre_de_seconde=int(nombre_seconde.get())
-    nombre_de_mesures = int(dure_mesure*int(nombre_de_seconde)/intervalle_temps)
+    dure_mesure=int(case_dure_mesures.get())#récupère la valeure de la variable dure_mesure
+    intervalle_temps=int(case_intervalle.get())#même fonctionnement que précédement
+    nombre_de_seconde=int(nombre_seconde.get())#même fonctionnement que précédement
+    nombre_de_mesures = int(dure_mesure*int(nombre_de_seconde)/intervalle_temps)#fait le calcul du nombre de mesures en fontion de la durée de la mesure, du nombre de seconde et de l'intervalle de temps
 
-def graphique(liste1, liste2, liste_des_dates_de_mesures):
-    valeur_moyenne_temperature.cget("text")
-    liste_numeros_des_mesures = []
+def graphique(liste1, liste2, liste_des_dates_de_mesures):# fonction permettant l'affichage et la modification ,via le menu préférence ,du graphique
+    liste_numeros_des_mesures = []# création d'une liste qui remplace les dates mises initialement sur l'axe des abscisses par des numéros pour espacés les mesures
     for i in range(nombre_de_mesures):
         liste_numeros_des_mesures.append(i+1)
-    plt.title(f"Température et Taux d'humididté à partir de {liste_des_dates_de_mesures[0]}")
-    plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité",linestyle=f"{aspect_courbe_humidite}", marker="+", color=f"{couleur_courbe_humidite}")
+    plt.title(f"Température et Taux d'humididté à partir de {liste_des_dates_de_mesures[0]}") #titre du graphique(il contient la date de la première mesure)
+    plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité",linestyle=f"{aspect_courbe_humidite}", marker="+", color=f"{couleur_courbe_humidite}")#
     plt.plot(liste_numeros_des_mesures, liste2, label="Température",linestyle=f"{aspect_courbe_temperature}", marker="+", color=f"{couleur_courbe_temperature}")
     plt.ylabel("valeur")
     plt.xlabel("numéro de la mesure")
@@ -242,14 +247,21 @@ def graphique_redirection():
         graphique(liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures)
 #########################initialisation########################################
 
-def configuration():#recherche la connexion serie
-    global port, inter_exter# définition des variable suivante en variable globales
-    Systeme_exploitation = str(input("quel est votre sytème d'exploitation (w/l)?\n>>>"))
-    if Systeme_exploitation=="l":
-        port="/dev/ttyACM0"
-    elif Systeme_exploitation=="w":
-        port= "COM4"
-    inter_exter = str(input("Les mesures sont à l'interrieur ou à l'exterieur (i/e)? \n>>>"))
+# def configuration():#recherche la connexion serie
+#     global port
+#     for num_port in range(6):
+#         try:
+#             num_port=str(num_port)
+#             test_port = "COM" + num_port
+#             print(test_port)
+#             communication_serie = serial.Serial(port, 9600)
+#             time.sleep(1)
+#             valeur = communication_serie.readline()
+#             print(test_port)
+#             if ">>>" in valeur:
+#                 port = "COM" + num_port
+#         except:
+#             print("except")
 
 ###########################communication #######################################
 
@@ -274,8 +286,9 @@ def reception():
             time.sleep(int(case_intervalle.get()))
          #####################################################################################################################################################
 
-def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans arduino
-    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures# définition des variable suivante en variable globales
+def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans capteur programmable
+    showinfo("simulation","la simulation permet de simuler une mesure. Elle est fonctionnelle sans capteur et donne des valeurs aléatoire. Elle utilise les valeurs présentes dans zone de contrôle")
+    global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures, nombre_de_mesures# définition des variable suivante en variable globales
     a=0
     for i in range(nombre_de_mesures*3):
         if a==0:
@@ -306,7 +319,6 @@ def analyse_donnees(valeurs):
     moyenne=round(sommes_des_valeurs/(len(valeurs)),2)
     maximum=max(valeurs)
     minimum=min(valeurs)
-    Affichage_console(valeurs,moyenne, maximum, minimum)
 
     # if inter_exter=="e":
     #     pass #moyennes de saisons
@@ -362,16 +374,19 @@ def enregistrement_reg():
 
 ##################################demarrage mesure et analyse ##################
 def demarrage():
-    # configuration()
     enregistrement=0
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures# définition des variable suivante en variable globales
     global min_humidite, max_humidite, moy_humidite, min_temperature, max_temperature, moy_temperature# définition des variable suivante en variable globales
+    global simu
     liste_des_humiditees = []
     liste_des_temperature = []
     liste_des_dates_de_mesures = []
     recuperation_valeurs()
-    simulation_reception()
-
+    if simu==1:
+        simulation_reception()
+    else:
+        reception()
+    simu = 0
     temperature_actuelle=liste_des_temperature[len(liste_des_temperature)-1]
     humidite_actuelle=liste_des_humiditees[len(liste_des_humiditees)-1]
     valeur_temperature.config( text =  temperature_actuelle)
@@ -393,7 +408,7 @@ def demarrage():
         valeur_moyenne_humidite.config(text = moyenne)
         moy_humidite=moyenne
     sauvergarde_historique()
-
-    fenetre.mainloop()
+    showinfo("Mesures terminées", "vos mesures ont été effectuées")
 ######################################debut ####################################
+# configuration()
 affichage_tkinter()

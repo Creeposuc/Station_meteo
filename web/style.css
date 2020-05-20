@@ -10,20 +10,14 @@ body{
 header{
   background-color: rgb(0,0,0);
   color: white;
-  padding-top: 1%;
+  padding: 1%;
   width: 100%;
-  height: 100px;
-  position: fixed;
-  z-index: 2;
+
 }
 nav{
-  position: sticky;
   display: flex;
   justify-content: space-around;
-  padding: 5%;
-  padding-top: 15%;
-  z-index: 1;
-
+  padding: 1%;
 }
 nav a{
   text-decoration: none;
@@ -59,9 +53,29 @@ nav a{
 #présentation_par_idées .visualisation{
       border: 4px green solid;
 }
-
 /**********************************images**************************************/
 #image_regressis{
   width: 40%;
   margin-left: 5%;
+  border-radius: 5px;
+}
+/**********************************agencement_aide*****************************/
+#corps_sous_navigation{
+  display: flex;
+  justify-content: space-around;
+}
+.gauche{
+  width: 20%;
+  margin: 2%;
+  padding: 1%;
+  border: 2px red solid;
+  border-radius: 10px;
+}
+.gauche:hover{
+  box-shadow: 10px 10px 10px black;
+  background-color: rgb(82, 82, 82);
+}
+.droite{
+  width: 70%;
+  margin: 2%;
 }

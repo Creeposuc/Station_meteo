@@ -3,8 +3,13 @@ import os
 print(">>>lancement_historique")
 def historique():
     global date_recherche_selectionne, boutton_recherche, affichage_resultat
-
     historique=Tk()
+    bar_de_menu = Menu(historique)# création d'une barre de menu dans la fenêtre
+    Menu_fichier = Menu(bar_de_menu, tearoff=0) # on créer une variable qui gère la barre de menu
+    Menu_fichier.add_command(label = "quitter", command=exit)# création d'un boutton dans le menu déroulant qui a un nom (Label) et une commande (une fonction)
+    bar_de_menu.add_cascade(label="Fichier", menu=Menu_fichier) #on donne le nom de "Fichier" au menu déroulant définit par Menu_fichier
+    historique.config(menu=bar_de_menu)#on donne le menu précédent a la fenêtre de nom "fenetre"
+
     titre_historique = Label(historique, text="Historique", font=("bold",16)).grid(row=0, column=0)
 
     cadre_recherche = Frame(historique, borderwidth=5, relief=GROOVE)

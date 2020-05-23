@@ -13,7 +13,7 @@ try:# on essaie d'importer les modules suivant
     import datetime#permet de récuperérer l'heure actuelle
     from subprocess import run#permet de lancer des sous processus
     import pyperclip#permet de copier un élément dans le press papier
-
+    import threading
 except ModuleNotFoundError: # si il y a une erreur de module non trouvé
     webbrowser.open(os.getcwd()+"/web/aide.html")# on ouvre une page web d'aide
     exit()#on ferme le programme python
@@ -51,9 +51,13 @@ def recuperation_preferences():# fonction qui récupère les valeurs des préfé
 recuperation_preferences()# on exécute la commande au début du programme
 ###########################threads##############################################
 def lancement_historique():# permet de lancer la fenêtre de l'historique
-    run("python historique.py")# lance la commande suivante dans un CMD afin de lancer le programme qui s'occupe de l'affichage et de la recherche dans l'historique
+    run("python historique.py")#permet de lancer des sous processus
+
+
 def lancement_preference():# permet de lancer la fenêtre des préférences
-    run("python preference.py")# Même fonctionnement
+    run("python preference.py")#permet de lancer des sous processus
+
+    #Même fonctionnement
 ###########################  Affichage   #######################################
 def affichage_tkinter():# fonction qui permet l'affichage de la fenêtre et des menus
     # la plupart des widget présent dans cette fonction ainsi que les placement de ces éléments ont une construction ressanblante, au moins un des widget de chaque type est commenté
@@ -179,7 +183,7 @@ def affichage_tkinter():# fonction qui permet l'affichage de la fenêtre et des 
     valeur_moyenne_humidite.grid(row=10, column=3)
 
     ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
-    bouton_graph = Button(fenetre, text="Afficher le graphique",command=graphique_redirection, bg=couleur_boutton)# création d'un boutton qui a pour texte "Démarrer la mesure", qui a pour commande "graphique redirection"
+    bouton_graph = Button(fenetre, text="Afficher le graphique",command=graphique, bg=couleur_boutton)# création d'un boutton qui a pour texte "Démarrer la mesure", qui a pour commande "graphique redirection"
     bouton_graph.grid(row=4 ,column=0)
 
     fenetre.mainloop()#lancement et ouverture de la fenêtre
@@ -189,7 +193,7 @@ def page_site():
     webbrowser.open(os.getcwd()+"/web/index.html")# on ouvre page la page du site web
 def quitter():# fonction qui permet de fermer le programme lorsqu'on click sur "quitter" dans le menue déroulant "fichier"
     if enregistrement==0:#si aucun enregistrement n'as été effectué
-        if Menu_fichier.add_command(label = "Préférence", command=lancement_preference):#un message d'alerte s'affiche
+        if askyesno("fermer sans enregistrer ?", "voulez vous fermer sans enregistrer?"):#un message d'alerte s'affiche
             exit()#si l'utilisateur appuie sur oui, alors le programe se ferme avec la fonction "exit"
     elif enregistrement==1:#les mesures ont été enregistrées
         exit() #alors le programe se ferme avec la fonction "exit"
@@ -227,64 +231,42 @@ def recuperation_valeurs():#cette fonction nous permet de faire la liaison entre
     nombre_de_seconde=int(nombre_seconde.get())#même fonctionnement que précédement
     nombre_de_mesures = int(dure_mesure*int(nombre_de_seconde)/intervalle_temps)#fait le calcul du nombre de mesures en fontion de la durée de la mesure, du nombre de seconde et de l'intervalle de temps
 
-def graphique(liste1, liste2, liste_des_dates_de_mesures):# fonction permettant l'affichage et la modification ,via le menu préférence ,du graphique
-    liste_numeros_des_mesures = []# création d'une liste qui remplace les dates mises initialement sur l'axe des abscisses par des numéros pour espacés les mesures
-    for i in range(nombre_de_mesures):
-        liste_numeros_des_mesures.append(i+1)
-    plt.title(f"Température et Taux d'humididté à partir de {liste_des_dates_de_mesures[0]}") #titre du graphique(il contient la date de la première mesure)
-    plt.plot(liste_numeros_des_mesures, liste1, label="Taux d'humidité",linestyle=f"{aspect_courbe_humidite}", marker="+", color=f"{couleur_courbe_humidite}")#
-    plt.plot(liste_numeros_des_mesures, liste2, label="Température",linestyle=f"{aspect_courbe_temperature}", marker="+", color=f"{couleur_courbe_temperature}")
-    plt.ylabel("valeur")
-    plt.xlabel("numéro de la mesure")
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-
-def graphique_redirection():
+def graphique():# fonction permettant l'affichage et la modification ,via le menu préférence ,du graphique
     if len(liste_des_humiditees)<=1:
         showinfo("Valeurs vide !", "Vous n'avez pas mesuré assé de valeur pour afficher le graphique")
     else:
-        graphique(liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures)
-#########################initialisation########################################
-
-# def configuration():#recherche la connexion serie
-#     global port
-#     for num_port in range(6):
-#         try:
-#             num_port=str(num_port)
-#             test_port = "COM" + num_port
-#             print(test_port)
-#             communication_serie = serial.Serial(port, 9600)
-#             time.sleep(1)
-#             valeur = communication_serie.readline()
-#             print(test_port)
-#             if ">>>" in valeur:
-#                 port = "COM" + num_port
-#         except:
-#             print("except")
-
+        liste_numeros_des_mesures = []# création d'une liste qui remplace les dates mises initialement sur l'axe des abscisses par des numéros pour espacés les mesures
+        for i in range(nombre_de_mesures):
+            liste_numeros_des_mesures.append(i+1)
+        plt.title(f"Température et Taux d'humididté à partir de {liste_des_dates_de_mesures[0]}") #titre du graphique(il contient la date de la première mesure)
+        plt.plot(liste_numeros_des_mesures, liste_des_humiditees, label="Taux d'humidité",linestyle=f"{aspect_courbe_humidite}", marker="+", color=f"{couleur_courbe_humidite}")#on ajoute la courbe qui montre les taux d'humidité en fonction des numéros des mesures. Cette courbe s'appelle "Taux d'humidité", elle à un aspect(linestyle) qui varie suivant les préférnce et les points sont notées par des "+"
+        plt.plot(liste_numeros_des_mesures, liste_des_temperature, label="Température",linestyle=f"{aspect_courbe_temperature}", marker="+", color=f"{couleur_courbe_temperature}") #même fonctionnement
+        plt.ylabel("valeur")#le nom de l'ordonnée
+        plt.xlabel("numéro de la mesure")#le nom de l'abssice
+        plt.legend()#on indique qu'il faut afficher la légende de courbes
+        plt.grid(True)#on affiche la grille
+        plt.show()#on montre le graphique
 ###########################communication #######################################
 
-def reception():
+def reception():#fonction qui permet de recevoir les valeurs mesurées par le capteur programmable
     global liste_des_humiditees, liste_des_temperature, liste_des_dates_de_mesures# définition des variable suivante en variable globales
-    a=0
-    communication_serie = serial.Serial(port, 9600)
-    for i in range(nombre_de_mesures*3):
-        valeur = communication_serie.readline()
-        valeur = str(valeur)
+    compteur=0#compteur qui permet déterminer si les valeurs mesurées sont des taux d'humiditées ou des température
+    communication_serie = serial.Serial(port, 9600)#on démarre la connexion avec le capteur, en utilisant le module serial, par le port  port="COM4" à 9600 bit par secondes
+    for i in range(nombre_de_mesures*3):#on lance une boucle qui fait nombre_de_mesures*3 tour, car chaque information envoyer par le capteur contient 3 information: une chaîne de début (>>>), la température et l'humidité
+        valeur = communication_serie.readline()#on lit la valeur  envoyer par le capteur
+        valeur = str(valeur)#on la convertit en la valeur en chaîne de carractère
         if ">>>" in valeur:
-            date = datetime.datetime.now()
-            liste_des_dates_de_mesures.append(str(f"{date.hour}h{date.minute}m{date.second}s"))
-            a=0
-            a+=1
-        elif a==1:
-            liste_des_humiditees.append(float(valeur[2:][:5]))
-            a+=1
-        elif a==2:
+            date = datetime.datetime.now()#on prends la date actuelle
+            liste_des_dates_de_mesures.append(str(f"{date.hour}h{date.minute}m{date.second}s"))#on l'ajoute a la liste_des_dates_de_mesures
+            compteur=0
+            compteur+=1
+        elif compteur==1:
+            liste_des_humiditees.append(float(valeur[2:][:5]))#on ajoute à la liste d'humiditée en enlevant les 2 premier et 5 dernier carractère (ils sont inutiles pour nous)
+            compteur+=1
+        elif compteur==2:
             liste_des_temperature.append(float(valeur[2:][:5]))
-            a=0
-            time.sleep(int(case_intervalle.get()))
-         #####################################################################################################################################################
+            compteur=0
+            time.sleep(int(case_intervalle.get()))# on attend le temps présent dans la case "case_intervalle" avant d'effectuer une nouvelle mesure
 
 def simulation_reception(): #simule la reception des donnees des capteur pour pouvoir coder sans capteur programmable
     showinfo("simulation","la simulation permet de simuler une mesure. Elle est fonctionnelle sans capteur et donne des valeurs aléatoire. Elle utilise les valeurs présentes dans zone de contrôle")

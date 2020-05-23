@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.colorchooser import *#gère les fenêtre popup
+from tkinter.messagebox import *
 import os
 couleur_boutton = "#FF0D39"
 couleur_courbe_humidite = "#0502E8"
@@ -78,4 +79,5 @@ def appliquer_preference():
         save_pref.write(f"{couleur_courbe_humidite}\n")
         save_pref.write(f"{aspect_courbe_humidite.get()}\n")
         save_pref.write(f"{aspect_courbe_temperature.get()}\n")
+    showinfo("Redémmarage Recquis", "Un redémmarage de l'application est requis pour que les changements s'applique")
 preference()

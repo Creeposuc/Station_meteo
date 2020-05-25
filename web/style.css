@@ -84,6 +84,17 @@ p i{
   margin-left: 5%;
   border-radius: 5px;
 }
+#télécharger{
+  text-align: center;
+  vertical-align: top;
+}
+.git {
+  width: 10%;
+}
+.telechargerimage {
+   width: 10%;
+}
+
 /**********************************agencement_aide*****************************/
 #corps_sous_navigation{
   display: flex;
